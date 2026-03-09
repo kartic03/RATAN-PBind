@@ -1,0 +1,22 @@
+# Sensitive
+.env
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.pytest_cache/
+
+# Large files excluded from repo
+models/esm2_finetuned.pt
+models/et.pkl
+features/esm2_embeddings.npy
+
+# Raw dataset (download separately from proteinbase.com)
+proteinbase_all_data_28_01_2026.csv
+
+# Misc
+.DS_Store
+*.log
