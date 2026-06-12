@@ -75,7 +75,7 @@ All experiments are scripted under `src/` and regenerate from the released artef
 - `src/r8_*`, `src/r8b_*` significance, leakage audits, few-shot, baselines, calibration, external/SKEMPI/MM-GBSA
 - `src/r7_figures_final.py` the manuscript figure set
 
-The headline model (`models/lgb_proto.pkl`), the feature matrix, feature columns, and the train/val/test splits are in the repo (`models/`, `features/`, `data/`). The large artefacts — the ESM-2 embeddings and the heavier baseline models (random forest, SVM, fine-tuned ESM-2) — are archived on Zenodo (DOI to be added) to keep the repo lightweight; they are also regenerable from `src/`. Each analysis script in `src/` writes its results to `outputs/` as CSV/JSON, so every reported number is regenerable.
+The headline model (`models/lgb_proto.pkl`), the feature matrix, feature columns, and the train/val/test splits are in the repo (`models/`, `features/`, `data/`). The large artefacts — the ESM-2 embeddings and the heavier baseline models (random forest, SVM, fine-tuned ESM-2) — are archived on Zenodo ([10.5281/zenodo.20656437](https://doi.org/10.5281/zenodo.20656437)) to keep the repo lightweight; they are also regenerable from `src/`. Each analysis script in `src/` writes its results to `outputs/` as CSV/JSON, so every reported number is regenerable.
 
 ## Supported targets (24)
 
