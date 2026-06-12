@@ -1,5 +1,5 @@
 """
-RATAN-PBind — sequence-based prioritisation of de novo protein binders
+RATAN-PBind — Retrieval-Augmented, Target-Aware Nomination for Protein Binding
 Gradio Web Application
 
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
@@ -942,7 +942,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
     <div class="pb-header">
       <p class="pb-title">RATAN-PBind</p>
       <p class="pb-subtitle">
-        Sequence-based de novo binder prioritisation &nbsp;·&nbsp;
+        Retrieval-Augmented, Target-Aware Nomination for Protein Binding &nbsp;·&nbsp;
         ESM-2 + prototype similarity &nbsp;·&nbsp; 24 targets &nbsp;·&nbsp; 2,630 pairs
       </p>
     </div>
@@ -1150,7 +1150,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
             gr.Markdown(f"""
 ### RATAN-PBind
 
-**Sequence-based prioritisation of de novo protein binders**
+**Retrieval-Augmented, Target-Aware Nomination for Protein Binding**
 
 A machine-learning pre-screen for de novo binder campaigns across 24 human and viral targets,
 trained on experimental data from the Proteinbase dataset. It ranks candidates cheaply from

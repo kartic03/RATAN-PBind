@@ -468,7 +468,7 @@ class ProtBind:
                     p_xgb = float(self.xgb.predict_proba(X)[0, 1])
                     mut_prob = (p_lgb + p_xgb) / 2
 
-                    if mut_prob > base_prob + 0.01:   # only report improvements
+                    if mut_prob > base_prob + 0.001:  # report even small improvements
                         mutations.append({
                             "position":     pos + 1,
                             "original":     orig_aa,

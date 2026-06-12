@@ -1,6 +1,6 @@
 # RATAN-PBind
 
-**Sequence-based prioritisation of de novo protein binders, with a characterised applicability domain and few-shot extension to new targets.**
+**Retrieval-Augmented, Target-Aware Nomination for Protein Binding** — sequence-based prioritisation of de novo binders, with a characterised applicability domain and few-shot extension to new targets.
 
 A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein–target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders cheaply from sequence and reports *where its predictions can and cannot be trusted*.
 
@@ -89,7 +89,7 @@ Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence). The raw data
 
 ## Citation
 
-> Kartic, Choi J, Park T-S. RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised applicability domain and few-shot extension to new targets.
+> Kartic, Choi J, Park T-S. RATAN-PBind: Retrieval-Augmented, Target-Aware Nomination of de novo protein binders within a characterised applicability domain.
 > Code: https://github.com/kartic03/RATAN-PBind
 
 ## Authors
