@@ -1,0 +1,10 @@
+method,auroc,n
+colab_iptm_avg,0.734,3760
+boltz1_iptm_avg,0.746,3760
+af3_iptm_avg,0.764,3760
+colab_actifptm_avg,0.736,3760
+boltz1_ipSAE_avg,0.772,3756
+af3_ipSAE_avg,0.788,3760
+af2_pae_interaction,0.733,3760
+boltz1_complex_iplddt_avg,0.754,3760
+sequence_ML_5foldCV,0.73,3760

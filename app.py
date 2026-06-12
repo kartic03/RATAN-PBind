@@ -628,7 +628,7 @@ def chat_respond(message: str, history: list):
                     "5. esmfold_pLDDT — structural quality score\n\n"
                     "Prototype features occupy 5 of the top 9 positions.")
     elif any(w in msg for w in ["cite", "citation", "paper", "reference", "journal"]):
-        response = ("Paper under review (Journal of Cheminformatics):\n"
+        response = ("Paper in preparation:\n"
                     "RATAN-PBind: sequence-based prioritisation of de novo protein binders with a "
                     "characterised applicability domain and few-shot extension to new targets\n\n"
                     "Dataset: Proteinbase by Adaptyv Bio (ODC-BY license).")
@@ -1182,7 +1182,7 @@ This work used Proteinbase by Adaptyv Bio under the ODC-BY license.
 5,253 proteins · 2,630 labeled pairs · experimental binding evaluations.
 
 **Citation**
-Paper under review (Journal of Cheminformatics).
+Paper in preparation.
 *RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised
 applicability domain and few-shot extension to new targets*
 

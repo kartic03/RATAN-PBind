@@ -1,0 +1,8 @@
+design_method,n,binders,auroc
+unknown,1079,132,0.787
+boltzgen,531,105,0.793
+bindcraft,170,40,0.796
+rfdiffusion,110,38,0.91
+protrl,91,35,0.739
+dsm-synteract,59,26,0.944
+mosaic,57,41,0.75

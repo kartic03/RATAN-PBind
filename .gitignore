@@ -9,12 +9,14 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# Large files excluded from repo
+# Large files — archived on Zenodo, not GitHub (none is the headline model)
 models/esm2_finetuned.pt
 models/et.pkl
+models/rf.pkl
+models/svm.pkl
 features/esm2_embeddings.npy
 
-# Raw dataset (download separately from proteinbase.com)
+# Raw dataset (ODC-BY; download separately from proteinbase.com)
 proteinbase_all_data_28_01_2026.csv
 
 # Misc

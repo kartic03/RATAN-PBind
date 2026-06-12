@@ -75,7 +75,7 @@ All experiments are scripted under `src/` and regenerate from the released artef
 - `src/r8_*`, `src/r8b_*` significance, leakage audits, few-shot, baselines, calibration, external/SKEMPI/MM-GBSA
 - `src/r7_figures_final.py` the manuscript figure set
 
-Frozen feature matrices, train/val/test splits, ESM-2 embeddings, models, and target sequences are in `features/`, `data/`, and `models/` (and archived on Zenodo; DOI to be added on acceptance). `paper/REVISION_FINDINGS.md` documents every result with its source file.
+The headline model (`models/lgb_proto.pkl`), the feature matrix, feature columns, and the train/val/test splits are in the repo (`models/`, `features/`, `data/`). The large artefacts — the ESM-2 embeddings and the heavier baseline models (random forest, SVM, fine-tuned ESM-2) — are archived on Zenodo (DOI to be added) to keep the repo lightweight; they are also regenerable from `src/`. Each analysis script in `src/` writes its results to `outputs/` as CSV/JSON, so every reported number is regenerable.
 
 ## Supported targets (24)
 
@@ -89,7 +89,7 @@ Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence). The raw data
 
 ## Citation
 
-> Kartic, Choi J, Park T-S. RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised applicability domain and few-shot extension to new targets. *Journal of Cheminformatics* (under review).
+> Kartic, Choi J, Park T-S. RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised applicability domain and few-shot extension to new targets.
 > Code: https://github.com/kartic03/RATAN-PBind
 
 ## Authors

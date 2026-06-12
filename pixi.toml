@@ -1,0 +1,56 @@
+# RATAN-PBind — reproducible environments (pixi)
+#   pixi run -e ml  <cmd>   data/ML/stats (CPU) — all analysis scripts
+#   pixi run -e gpu <cmd>   ESM-2 embeddings + Boltz-2 folding (GPU)
+# `pixi run` builds the full env per invocation, so backgrounded/detached jobs
+# get correct CUDA libs (fixes the conda+setsid segfault). ml/gpu are independent
+# features so the CPU env locks without boltz's strict pins.
+
+[workspace]
+name = "ratan-pbind"
+channels = ["conda-forge"]
+platforms = ["linux-64"]
+
+# ---- ml feature (CPU): all analysis/statistics scripts ----
+[feature.ml.dependencies]
+python = "3.11.*"
+numpy = "<2"
+pandas = ">=2.0"
+scipy = ">=1.11"
+scikit-learn = ">=1.5"
+lightgbm = ">=4.5"
+xgboost = ">=2.0"
+pyarrow = ">=15"
+gemmi = ">=0.6"
+biopython = ">=1.83"
+matplotlib = ">=3.8"
+seaborn = ">=0.13"
+shap = ">=0.46"
+optuna = ">=3.6"
+
+[feature.ml.tasks]
+robust-eval = "python src/r3_robust_eval.py"
+rigor       = "python src/r8_rigor.py"
+robustness  = "python src/r8_robustness.py"
+stats       = "python src/r8b_stats.py"
+skempi      = "python src/r8_skempi.py"
+loto        = "python src/r1_loto_targetaware.py"
+
+
+# ---- gpu feature: ESM-2 embeddings (torch+fair-esm). Boltz folding uses conda (strict pins). ----
+[feature.gpu.system-requirements]
+cuda = "12"
+
+[feature.gpu.dependencies]
+python = "3.11.*"
+
+[feature.gpu.pypi-dependencies]
+torch = { version = "==2.5.1", index = "https://download.pytorch.org/whl/cu121" }
+fair-esm = "==2.0.0"
+numpy = "<2"
+
+[feature.gpu.tasks]
+embed-targets = "python src/r1_embed_targets.py"
+
+[environments]
+ml = { features = ["ml"] }
+gpu = { features = ["gpu"] }

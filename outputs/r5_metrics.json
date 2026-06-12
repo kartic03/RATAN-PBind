@@ -1,0 +1,8 @@
+{
+ "n": 24,
+ "grounding_precision": 0.8667,
+ "hallucination_rate": 0.1333,
+ "top1_mention_rate": 0.7917,
+ "top3_coverage": 0.5278,
+ "direction_consistency": 0.8409
+}
