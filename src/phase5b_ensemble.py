@@ -38,7 +38,7 @@ print(f"Device: {device}")
 
 # ── Load data ─────────────────────────────────────────────────────────────────
 print("\nLoading data...")
-# Load feature matrix as Phase 3 did — already contains imputed values + split column
+# Load feature matrix as Phase 3 did - already contains imputed values + split column
 feat_mat  = pd.read_parquet(FEATURES_DIR / "feature_matrix.parquet")
 feat_cols = pd.read_csv(FEATURES_DIR / "feature_columns.csv")["column"].tolist()
 
@@ -49,7 +49,7 @@ test_fm  = feat_mat[feat_mat["split"] == "test"].reset_index(drop=True)
 X_hc_train = train_fm[feat_cols].values.astype(np.float32)
 X_hc_val   = val_fm[feat_cols].values.astype(np.float32)
 X_hc_test  = test_fm[feat_cols].values.astype(np.float32)
-y_val      = train_fm["binding_label"].values  # placeholder — overwritten below
+y_val      = train_fm["binding_label"].values  # placeholder - overwritten below
 y_val      = val_fm["binding_label"].values.astype(np.float32)
 y_test     = test_fm["binding_label"].values.astype(np.float32)
 
@@ -104,9 +104,9 @@ lgb_test_prob = lgb_model.predict_proba(X_hc_test)[:, 1]
 xgb_val_prob  = xgb_model.predict_proba(X_hc_val)[:, 1]
 xgb_test_prob = xgb_model.predict_proba(X_hc_test)[:, 1]
 
-print(f"  LightGBM  — Val AUROC={roc_auc_score(y_val,  lgb_val_prob):.4f}  "
+print(f"  LightGBM  - Val AUROC={roc_auc_score(y_val,  lgb_val_prob):.4f}  "
       f"Test AUROC={roc_auc_score(y_test, lgb_test_prob):.4f}")
-print(f"  XGBoost   — Val AUROC={roc_auc_score(y_val,  xgb_val_prob):.4f}  "
+print(f"  XGBoost   - Val AUROC={roc_auc_score(y_val,  xgb_val_prob):.4f}  "
       f"Test AUROC={roc_auc_score(y_test, xgb_test_prob):.4f}")
 
 # ── 2. Load Phase 5 TargetAwareMLP and get predictions ───────────────────────
@@ -144,7 +144,7 @@ def get_mlp_probs(mask):
 
 mlp_val_prob  = get_mlp_probs(val_m)
 mlp_test_prob = get_mlp_probs(test_m)
-print(f"  TargetAwareMLP — Val AUROC={roc_auc_score(y_val,  mlp_val_prob):.4f}  "
+print(f"  TargetAwareMLP - Val AUROC={roc_auc_score(y_val,  mlp_val_prob):.4f}  "
       f"Test AUROC={roc_auc_score(y_test, mlp_test_prob):.4f}")
 
 # ── 3. Optimize ensemble weights on validation set ────────────────────────────
@@ -174,7 +174,7 @@ for w0 in np.arange(0.2, 0.7, 0.1):
 res   = minimize(neg_auprc, best_w0, method='Nelder-Mead',
                  options={'xatol': 1e-5, 'fatol': 1e-5, 'maxiter': 1000})
 w_opt = np.abs(res.x) / np.abs(res.x).sum()
-print(f"  Weights — LightGBM: {w_opt[0]:.3f}  XGBoost: {w_opt[1]:.3f}  "
+print(f"  Weights - LightGBM: {w_opt[0]:.3f}  XGBoost: {w_opt[1]:.3f}  "
       f"TargetAwareMLP: {w_opt[2]:.3f}")
 
 ens_val_prob  = (val_preds  * w_opt).sum(axis=1)
@@ -187,10 +187,10 @@ m_wt_t = metrics(y_test, ens_test_prob)
 m_si  = metrics(y_val,  simple_val)
 m_si_t = metrics(y_test, simple_test)
 
-print(f"  Weighted avg Val  — AUROC={m_wt[0]:.4f}  AUPRC={m_wt[1]:.4f}  F1={m_wt[2]:.4f}  MCC={m_wt[3]:.4f}")
-print(f"  Weighted avg Test — AUROC={m_wt_t[0]:.4f}  AUPRC={m_wt_t[1]:.4f}  F1={m_wt_t[2]:.4f}  MCC={m_wt_t[3]:.4f}")
-print(f"  Simple avg   Val  — AUROC={m_si[0]:.4f}  AUPRC={m_si[1]:.4f}  F1={m_si[2]:.4f}  MCC={m_si[3]:.4f}")
-print(f"  Simple avg   Test — AUROC={m_si_t[0]:.4f}  AUPRC={m_si_t[1]:.4f}  F1={m_si_t[2]:.4f}  MCC={m_si_t[3]:.4f}")
+print(f"  Weighted avg Val  - AUROC={m_wt[0]:.4f}  AUPRC={m_wt[1]:.4f}  F1={m_wt[2]:.4f}  MCC={m_wt[3]:.4f}")
+print(f"  Weighted avg Test - AUROC={m_wt_t[0]:.4f}  AUPRC={m_wt_t[1]:.4f}  F1={m_wt_t[2]:.4f}  MCC={m_wt_t[3]:.4f}")
+print(f"  Simple avg   Val  - AUROC={m_si[0]:.4f}  AUPRC={m_si[1]:.4f}  F1={m_si[2]:.4f}  MCC={m_si[3]:.4f}")
+print(f"  Simple avg   Test - AUROC={m_si_t[0]:.4f}  AUPRC={m_si_t[1]:.4f}  F1={m_si_t[2]:.4f}  MCC={m_si_t[3]:.4f}")
 
 # Pick best ensemble by val AUPRC
 if m_wt[1] >= m_si[1]:
@@ -215,8 +215,8 @@ cal_test_prob = cal.predict_proba(ens_test_best.reshape(-1, 1))[:, 1]
 
 m_cal_v = metrics(y_val,  cal_val_prob)
 m_cal_t = metrics(y_test, cal_test_prob)
-print(f"  Calibrated Val  — AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
-print(f"  Calibrated Test — AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
+print(f"  Calibrated Val  - AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
+print(f"  Calibrated Test - AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
 
 # ── 5. Per-target threshold optimization ─────────────────────────────────────
 print("\n" + "="*70)
@@ -263,7 +263,7 @@ auroc_pt = roc_auc_score(y_test, cal_test_prob)
 auprc_pt = average_precision_score(y_test, cal_test_prob)
 f1_pt    = f1_score(y_test, y_pred_pt, zero_division=0)
 mcc_pt   = matthews_corrcoef(y_test, y_pred_pt)
-print(f"\n  Calibrated + Per-Target Thr Test — AUROC={auroc_pt:.4f}  AUPRC={auprc_pt:.4f}  "
+print(f"\n  Calibrated + Per-Target Thr Test - AUROC={auroc_pt:.4f}  AUPRC={auprc_pt:.4f}  "
       f"F1={f1_pt:.4f}  MCC={mcc_pt:.4f}")
 
 # ── 6. Per-target breakdown on final model ────────────────────────────────────
@@ -295,7 +295,7 @@ for t in target_names:
 
 # ── 7. Final summary ──────────────────────────────────────────────────────────
 print("\n" + "="*70)
-print("PHASE 5b — FINAL SUMMARY (TEST SET)")
+print("PHASE 5b - FINAL SUMMARY (TEST SET)")
 print(f"  {'Model':<45}  {'AUROC':>7}  {'AUPRC':>7}  {'F1':>7}  {'MCC':>7}")
 print("  " + "-"*75)
 print(f"  {'--- Baselines ---':<45}")

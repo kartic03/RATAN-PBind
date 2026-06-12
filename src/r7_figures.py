@@ -10,7 +10,7 @@ print("Arial available:", "Arial" in avail, "| using:", "Arial" if "Arial" in av
 OUT="paper/figures_v2"
 C={"good":"#2c7fb8","mid":"#41ab5d","bad":"#e6550d","grey":"#737373"}
 
-# Fig 1 — applicability-domain gradient (horizontal dot + error bars)
+# Fig 1 - applicability-domain gradient (horizontal dot + error bars)
 ax_labels=["In-distribution\n(held-out test)","Across design\nmethods","New campaign\n(leave-author-out)","Zero-shot to\nnovel targets (LOTO)","Independent\ndataset"]
 vals=[0.946,0.817,0.771,0.555,0.49]; lo=[0.919,None,0.771-0.114,0.54,None]; hi=[0.968,None,0.771+0.114,0.57,None]
 cols=[C["good"],C["mid"],C["mid"],C["bad"],C["bad"]]
@@ -25,7 +25,7 @@ ax.set_yticks(ypos); ax.set_yticklabels(ax_labels); ax.set_xlim(0.40,1.0); ax.se
 ax.set_title("Applicability domain: a clear generalisation gradient"); ax.grid(axis="x",alpha=0.3)
 plt.tight_layout(); plt.savefig(f"{OUT}/fig1_applicability_domain.png"); plt.close()
 
-# Fig 2 — few-shot recovery curve with CI band
+# Fig 2 - few-shot recovery curve with CI band
 d=pd.read_csv("outputs/r8b_fewshot_ci.csv")
 fig,ax=plt.subplots(figsize=(8,5))
 ax.fill_between(d.k,d.ci_lo,d.ci_hi,alpha=0.2,color=C["good"])
@@ -37,7 +37,7 @@ ax.set_title("Few-shot recovery: 2 labels move a new target from chance to usefu
 ax.set_xticks(d.k); ax.set_ylim(0.42,0.80); ax.grid(alpha=0.3)
 plt.tight_layout(); plt.savefig(f"{OUT}/fig2_fewshot_recovery.png"); plt.close()
 
-# Fig 3 — single-feature baselines vs full model (horizontal lollipop)
+# Fig 3 - single-feature baselines vs full model (horizontal lollipop)
 bl=[("seq length",0.543),("molecular weight",0.538),("ESMFold pLDDT",0.545),("Boltz2 ipTM (nipah)",0.682),
     ("method success rate",0.719),("ESM-2 nearest-centroid",0.750),("proto_ratio",0.772),("Full RATAN-PBind",0.946)]
 bl=sorted(bl,key=lambda x:x[1]); names=[b[0] for b in bl]; v=[b[1] for b in bl]
@@ -49,7 +49,7 @@ ax.set_yticks(y); ax.set_yticklabels(names); ax.set_xlim(0.5,1.0); ax.set_xlabel
 ax.set_title("The model beats every single feature and naive retrieval"); ax.grid(axis="x",alpha=0.3)
 plt.tight_layout(); plt.savefig(f"{OUT}/fig3_baselines.png"); plt.close()
 
-# Fig 4 — per-target reliability (forest plot, reliable targets only)
+# Fig 4 - per-target reliability (forest plot, reliable targets only)
 pt=pd.read_csv("outputs/r3_per_target_ci.csv"); pt=pt[pt.n>=8].sort_values("n")
 fig,ax=plt.subplots(figsize=(8.5,5.5)); y=np.arange(len(pt))
 col=[C["good"] if r>=20 else C["bad"] for r in pt.n]
@@ -62,7 +62,7 @@ ax.set_xlabel("per-target test AUROC (95% CI)")
 ax.set_title("Only well-powered targets give reliable estimates (blue n>=20)"); ax.grid(axis="x",alpha=0.3)
 plt.tight_layout(); plt.savefig(f"{OUT}/fig4_per_target_ci.png"); plt.close()
 
-# Fig 5 — Boltz-2 design validation by category (dot/strip)
+# Fig 5 - Boltz-2 design validation by category (dot/strip)
 bz=pd.read_csv("outputs/r4_boltz_iptm.csv")
 order=["binder","designed","nonbinder","scrambled"]; colmap={"binder":C["good"],"designed":C["mid"],"nonbinder":C["bad"],"scrambled":C["grey"]}
 fig,ax=plt.subplots(figsize=(8,5))

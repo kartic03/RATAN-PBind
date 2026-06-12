@@ -43,7 +43,7 @@ def save(name):
     plt.savefig(FIG/f"{name}.pdf", bbox_inches="tight", pad_inches=0.10)
     plt.close(); print("saved", name)
 
-# ── Figure 1 — dataset (a) + pipeline (b) ────────────────────────────────────
+# ── Figure 1 - dataset (a) + pipeline (b) ────────────────────────────────────
 def fig1():
     fig, (ax, ax2) = plt.subplots(1, 2, figsize=(13.4, 5.2),
                                   gridspec_kw={"width_ratios": [1, 1.5]}, layout="constrained")
@@ -61,7 +61,7 @@ def fig1():
         ax.text(r+1.6, yi, f"{r:.0f}", va="center", ha="left", fontsize=9, color="#5A626D")
     ax.tick_params(length=0, axis="y"); panel(ax, "a")
 
-    # pipeline — 4 clean columns, arrows live in the column gaps, drawn above boxes
+    # pipeline - 4 clean columns, arrows live in the column gaps, drawn above boxes
     ax2.set_xlim(0,14); ax2.set_ylim(0,10); ax2.axis("off"); panel(ax2,"b", dx=-0.04)
     def box(cx,cy,w,h,t,fc,fg="white",fs=10.5):
         ax2.add_patch(FancyBboxPatch((cx-w/2,cy-h/2),w,h,
@@ -86,7 +86,7 @@ def fig1():
              color="#7A8290",style="italic",linespacing=1.3)
     save("fig1_dataset_pipeline")
 
-# ── Figure 2 — model performance (AUROC | AUPRC lollipops) ───────────────────
+# ── Figure 2 - model performance (AUROC | AUPRC lollipops) ───────────────────
 def fig2():
     M=[("Logistic regression",0.790,0.499,3),("Random forest",0.854,0.580,3),
        ("XGBoost",0.880,0.682,3),("LightGBM",0.893,0.713,3),("XGB + ESM-2",0.871,0.633,4),
@@ -113,7 +113,7 @@ def fig2():
                    frameon=False,loc="lower right")
     save("fig2_model_comparison")
 
-# ── Figure 3 — SHAP ──────────────────────────────────────────────────────────
+# ── Figure 3 - SHAP ──────────────────────────────────────────────────────────
 def fig3():
     df=pd.read_csv(OUT/"phase6d_shap.csv").sort_values("mean_abs").tail(15)
     cols=[C["purple"] if r["is_proto"] else C["slate"] for _,r in df.iterrows()]
@@ -129,7 +129,7 @@ def fig3():
               frameon=False,loc="lower right")
     save("fig3_shap")
 
-# ── Figure 4 — per-target forest ─────────────────────────────────────────────
+# ── Figure 4 - per-target forest ─────────────────────────────────────────────
 def fig4():
     df=pd.read_csv(OUT/"r3_per_target_ci.csv").sort_values("n")
     fig,ax=plt.subplots(figsize=(8.2,6.0),layout="constrained"); y=np.arange(len(df))
@@ -150,7 +150,7 @@ def fig4():
               frameon=False,loc="lower left")
     save("fig4_per_target_ci")
 
-# ── Figure 5 — applicability domain ──────────────────────────────────────────
+# ── Figure 5 - applicability domain ──────────────────────────────────────────
 def fig5():
     R=[("In-distribution (nested CV)",0.895,0.889,0.901,C["teal"]),
        ("Across design methods",0.817,None,None,C["teal"]),
@@ -170,7 +170,7 @@ def fig5():
     ax.tick_params(length=0,axis="y")
     save("fig5_applicability_domain")
 
-# ── Figure 6 — few-shot ──────────────────────────────────────────────────────
+# ── Figure 6 - few-shot ──────────────────────────────────────────────────────
 def fig6():
     d=pd.read_csv(OUT/"r8b_fewshot_ci.csv")
     fig,ax=plt.subplots(figsize=(7.8,5.0),layout="constrained")
@@ -186,7 +186,7 @@ def fig6():
     ax.set_xticks(d.k); ax.set_ylim(0.44,0.78); ax.set_xlim(-0.5,10.5)
     save("fig6_fewshot_recovery")
 
-# ── Figure 7 — stability + calibration ───────────────────────────────────────
+# ── Figure 7 - stability + calibration ───────────────────────────────────────
 def fig7():
     s=pd.read_csv(OUT/"phase6d_seed_results.csv")
     lgb=s[s.model.str.contains("LGB|LightGBM",case=False,regex=True)]["test_auroc"].values
@@ -216,7 +216,7 @@ def fig7():
     panel(ax2,"b"); ax2.set_title("Calibration (test set)")
     save("fig7_stability_calibration")
 
-# ── Figure 8 — structural validation ─────────────────────────────────────────
+# ── Figure 8 - structural validation ─────────────────────────────────────────
 def fig8():
     bz=pd.read_csv(OUT/"r4_boltz_iptm.csv")
     order=["binder","designed","nonbinder","scrambled"]
@@ -235,7 +235,7 @@ def fig8():
     ax.set_ylabel("Boltz-2 interface ipTM"); ax.set_ylim(0,1.0); ax.set_xlim(-0.6,len(present)-0.4)
     ax.tick_params(length=0,axis="x"); save("fig8_structural_validation")
 
-# ── Figure S1 — baselines ────────────────────────────────────────────────────
+# ── Figure S1 - baselines ────────────────────────────────────────────────────
 def figS1():
     bl=[("sequence length",0.543),("molecular weight",0.538),("ESMFold pLDDT",0.545),
         ("isoelectric point",0.585),("Boltz2 ipTM (nipah)",0.682),("design-method success",0.719),

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1 support — export pair metadata + base feature matrix to npy/csv so the
+"""R1 support - export pair metadata + base feature matrix to npy/csv so the
 base env (no pyarrow) can train. Run in `research` env. Portable ROOT."""
 import os, json, numpy as np, pandas as pd
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

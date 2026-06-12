@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 Batch 3 — cheap ML vs expensive structure prediction. On Overath (which has
+"""R8 Batch 3 - cheap ML vs expensive structure prediction. On Overath (which has
 precomputed AF2/AF3/Boltz/ColabFold interface-confidence metrics + binary labels),
 compare each structural metric (single-feature classifier) vs a cheap sequence-feature
 ML model (5-fold CV) for predicting experimental binding success. CPU."""

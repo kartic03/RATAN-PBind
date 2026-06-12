@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R5 — LLM-interpretation faithfulness. For N test predictions,
+"""R5 - LLM-interpretation faithfulness. For N test predictions,
 generate the real SHAP->Groq/Llama-3.3-70b explanation and quantify whether the
 LLM stays grounded in the SHAP features it was given (anti-hallucination), cites
 the true top drivers, and states directions consistent with SHAP signs. base env."""

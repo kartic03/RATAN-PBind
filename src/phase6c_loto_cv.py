@@ -302,8 +302,8 @@ print(f"    Mean AUPRC : {evaluable['auprc_no_proto'].mean():.4f}")
 # Large targets separately
 large = evaluable[evaluable["n"] >= 20]
 print(f"\n  Large targets only (n≥20, {len(large)} targets):")
-print(f"    With proto  — Mean AUROC={large['auroc_with_proto'].mean():.4f}  Mean AUPRC={large['auprc_with_proto'].mean():.4f}")
-print(f"    No proto    — Mean AUROC={large['auroc_no_proto'].mean():.4f}  Mean AUPRC={large['auprc_no_proto'].mean():.4f}")
+print(f"    With proto  - Mean AUROC={large['auroc_with_proto'].mean():.4f}  Mean AUPRC={large['auprc_with_proto'].mean():.4f}")
+print(f"    No proto    - Mean AUROC={large['auroc_no_proto'].mean():.4f}  Mean AUPRC={large['auprc_no_proto'].mean():.4f}")
 
 # ── Comparison: in-distribution (random split) vs LOTO ────────────────────────
 print("\n" + "="*70)

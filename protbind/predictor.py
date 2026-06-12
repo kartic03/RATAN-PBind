@@ -1,5 +1,5 @@
 """
-protbind.predictor — Core RATAN-PBind prediction engine
+protbind.predictor - Core RATAN-PBind prediction engine
 RATAN-PBind: Residue Attribution and Target Affinity Network for Protein Binding
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
 
@@ -27,7 +27,7 @@ _FEATURES_DIR = _HERE / "features"
 
 class ProtBind:
     """
-    RATAN-PBind — Residue Attribution and Target Affinity Network for Protein Binding.
+    RATAN-PBind - Residue Attribution and Target Affinity Network for Protein Binding.
 
     Predicts whether a protein sequence will bind to a specified target
     using a LightGBM ensemble trained on the Proteinbase dataset.
@@ -168,7 +168,7 @@ class ProtBind:
                             dtype=np.float32)
 
         # 2. Impute missing values (uses training medians)
-        # The imputer was fit on 447 cols — handle any size mismatch gracefully
+        # The imputer was fit on 447 cols - handle any size mismatch gracefully
         imputer_cols = len(self.imputer.statistics_)
         if len(base_arr) >= imputer_cols:
             base_arr[:imputer_cols] = self.imputer.transform(
@@ -181,7 +181,7 @@ class ProtBind:
         # Assemble as dict for interface feature alignment
         base_dict = {col: base_arr[i] for i, col in enumerate(self.base_feat_cols)}
 
-        # 3. Interface features (39) — impute with training medians if not provided
+        # 3. Interface features (39) - impute with training medians if not provided
         if_feats = {col: self.if_meds.get(col, 0.0) for col in self.if_cols}
 
         # 4. ESM-2 embedding
@@ -221,14 +221,14 @@ class ProtBind:
         Returns
         -------
         dict with keys:
-            probability   : float [0, 1] — binding probability
-            confidence    : str — 'High' / 'Medium' / 'Low'
-            uncertainty   : float — std between LGB and XGB predictions
-            threshold     : float — optimal per-target threshold (from validation)
-            predicted     : bool — True if probability >= threshold
-            target        : str — target name
-            proto_cos_pos : float — similarity to known binders (key feature)
-            proto_ratio   : float — discriminative score
+            probability   : float [0, 1] - binding probability
+            confidence    : str - 'High' / 'Medium' / 'Low'
+            uncertainty   : float - std between LGB and XGB predictions
+            threshold     : float - optimal per-target threshold (from validation)
+            predicted     : bool - True if probability >= threshold
+            target        : str - target name
+            proto_cos_pos : float - similarity to known binders (key feature)
+            proto_ratio   : float - discriminative score
         """
         feat_vec, emb = self._build_feature_vector(
             sequence, target, protein_id, design_method, precomputed)
@@ -274,9 +274,9 @@ class ProtBind:
         Returns
         -------
         dict with keys:
-            shap_values     : np.ndarray — SHAP values for all features
+            shap_values     : np.ndarray - SHAP values for all features
             top_features    : list of (feature_name, shap_value, feature_value)
-            natural_language: str — human-readable explanation
+            natural_language: str - human-readable explanation
             feature_names   : list of feature names
         """
         import shap
@@ -330,11 +330,11 @@ class ProtBind:
             if feat_name == "proto_ratio":
                 if positive:
                     drivers.append(f"High similarity ratio to known binders vs non-binders "
-                                   f"(proto_ratio = {feat_val:.2f}) — this sequence resembles "
+                                   f"(proto_ratio = {feat_val:.2f}) - this sequence resembles "
                                    f"known binders of {target}.")
                 else:
                     concerns.append(f"Low binder/non-binder similarity ratio "
-                                    f"(proto_ratio = {feat_val:.2f}) — sequence resembles "
+                                    f"(proto_ratio = {feat_val:.2f}) - sequence resembles "
                                     f"non-binders more than binders.")
 
             elif feat_name == "proto_cos_pos":
@@ -365,7 +365,7 @@ class ProtBind:
                     concerns.append(f"High instability index ({feat_val:.1f}) suggests the protein "
                                     f"may be unstable in solution.")
                 elif positive and feat_val < 30:
-                    drivers.append(f"Low instability index ({feat_val:.1f}) — protein predicted "
+                    drivers.append(f"Low instability index ({feat_val:.1f}) - protein predicted "
                                    f"to be stable.")
 
             elif feat_name == "proteinmpnn_score":
@@ -451,7 +451,7 @@ class ProtBind:
                 if mut_aa == orig_aa:
                     continue
                 mut_seq = seq[:pos] + mut_aa + seq[pos+1:]
-                # Use same ESM-2 embedding (approximate — only handcrafted features change)
+                # Use same ESM-2 embedding (approximate - only handcrafted features change)
                 try:
                     fv, _ = self._build_feature_vector(
                         mut_seq, target, protein_id=None,

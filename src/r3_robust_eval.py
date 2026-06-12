@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R3 — robust evaluation (CPU, LightGBM). Reconstructs base+prototype model on
+"""R3 - robust evaluation (CPU, LightGBM). Reconstructs base+prototype model on
 the standard train/test split and reports: bootstrap 95% CIs on headline metrics,
 per-target reliability with CIs (fixes small-n AUROC=1.000), single-vs-shared
 models, and leave-one-design-method-out generalization."""

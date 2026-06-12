@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1.1 — fetch & verify the 24 target UniProt sequences -> data/targets/.
+"""R1.1 - fetch & verify the 24 target UniProt sequences -> data/targets/.
 Portable: ROOT derived from this file's location. Any env (urllib only)."""
 import os, json, time, csv, urllib.request
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

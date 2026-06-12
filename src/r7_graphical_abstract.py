@@ -1,4 +1,4 @@
-"""Graphical abstract for J. Cheminformatics — 920x300 px, white background,
+"""Graphical abstract for J. Cheminformatics - 920x300 px, white background,
 <150 KB. Designed as a cohesive infographic: three grouped stage-cards with
 subtle fills, a clean sequence motif, soft embedding clusters, an applicability
 gradient, and prominent number callouts."""
@@ -36,7 +36,7 @@ ax.text(0.015, 0.95, "RATAN-PBind", fontsize=13.5, fontweight="bold", color=INK,
 ax.text(0.985, 0.95, "sequence-based de novo binder pre-screening",
         fontsize=8.6, color=SLATE, va="center", ha="right", style="italic")
 
-# ── Card 1 — de novo binder candidate (clean sequence motif) ────────────────
+# ── Card 1 - de novo binder candidate (clean sequence motif) ────────────────
 ax.text(0.1175, 0.74, "De novo binder candidate", fontsize=9.2, fontweight="bold",
         ha="center", color=INK)
 seq = "MASWKELLVQRTI"
@@ -50,7 +50,7 @@ for i, a in enumerate(seq):
 ax.text(0.1175, 0.355, "amino-acid sequence", fontsize=7.4, ha="center", color=SLATE, style="italic")
 ax.text(0.1175, 0.20, "24 targets · 2,630 pairs", fontsize=8.4, ha="center", color=INK, fontweight="bold")
 
-# ── Card 2 — prototype similarity (soft clusters + candidate) ────────────────
+# ── Card 2 - prototype similarity (soft clusters + candidate) ────────────────
 ax.text(0.440, 0.74, "Target-conditioned prototype similarity", fontsize=9.2,
         fontweight="bold", ha="center", color=INK)
 axp = fig.add_axes([0.315, 0.295, 0.250, 0.36]); axp.set_facecolor("none")
@@ -73,7 +73,7 @@ for lx, col, lab, mk in [(0.350, BLUE, "binders", "o"), (0.430, "#AEB7C2", "non-
                edgecolor=(INK if mk == "*" else "none"), linewidths=0.4, zorder=4)
     ax.text(lx+0.011, ly, lab, fontsize=6.8, va="center", color=SLATE)
 
-# ── Card 3 — prioritise + applicability domain ──────────────────────────────
+# ── Card 3 - prioritise + applicability domain ──────────────────────────────
 ax.text(0.8225, 0.74, "Ranked binders + applicability domain", fontsize=9.2,
         fontweight="bold", ha="center", color=INK)
 axg = fig.add_axes([0.690, 0.215, 0.135, 0.40])

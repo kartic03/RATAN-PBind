@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R6 — feature engineering: (1) frequency-normalised DPC
+"""R6 - feature engineering: (1) frequency-normalised DPC
 (observed/expected, removing AA-composition bias) tested vs raw DPC; (2) sequence
 redundancy / effective-sample-size analysis. CPU/LightGBM. research env."""
 import warnings, numpy as np, pandas as pd
@@ -19,7 +19,7 @@ def dpc_raw(seq):
     for i in range(len(seq)-1): v[AIDX[seq[i]]*20+AIDX[seq[i+1]]]+=1
     return v/m
 def dpc_norm(seq):
-    """observed/expected: log((obs+eps)/(f_i*f_j+eps)) — removes AA-frequency bias."""
+    """observed/expected: log((obs+eps)/(f_i*f_j+eps)) - removes AA-frequency bias."""
     a=aac(seq); d=dpc_raw(seq); exp=np.outer(a,a).ravel(); eps=1e-4
     return np.log((d+eps)/(exp+eps))
 

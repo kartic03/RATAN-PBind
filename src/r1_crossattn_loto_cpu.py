@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1.4/R1.5 — cross-attention binder x target LOTO, CPU-ONLY + lightweight.
+"""R1.4/R1.5 - cross-attention binder x target LOTO, CPU-ONLY + lightweight.
 Safe variant: never touches the display GPU (CUDA disabled), caps CPU threads,
 and downsamples each target to <=TGT_CAP residues (strided) to bound runtime.
 -> outputs/r1_xattn_loto_{pure,hybrid}_cpu.csv"""

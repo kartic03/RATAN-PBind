@@ -4,7 +4,7 @@
 
 **Retrieval-Augmented, Target-Aware Nomination for Protein Binding** - sequence-based prioritisation of de novo binders, with a characterised applicability domain and few-shot extension to new targets.
 
-A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein–target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders cheaply from sequence and reports *where its predictions can and cannot be trusted*.
+A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein-target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders cheaply from sequence and reports *where its predictions can and cannot be trusted*.
 
 ![Graphical Abstract](graphical_abstract.png)
 
@@ -18,10 +18,10 @@ The contribution is an honest, quantified **applicability domain** rather than a
 
 | Evaluation | AUROC |
 |---|---|
-| In-distribution, held-out test | **0.946** (95% CI 0.919–0.968) |
+| In-distribution, held-out test | **0.946** (95% CI 0.919-0.968) |
 | In-distribution, nested cross-validation (leakage-free) | **0.895 ± 0.006** |
-| Across design methods (leave-method/author-out) | 0.73–0.82 |
-| Zero-shot to a novel target (LOTO) | 0.54–0.57 |
+| Across design methods (leave-method/author-out) | 0.73-0.82 |
+| Zero-shot to a novel target (LOTO) | 0.54-0.57 |
 | Independent dataset (after de-duplication) | ~0.49 |
 
 - **470 features** (463 base + 7 prototype-similarity). `proto_ratio` is the top SHAP feature.
@@ -66,7 +66,7 @@ explanation = pb.explain(result, top_n=10)
 mutations   = pb.suggest_mutations(sequence, target="egfr", top_n=10)
 ```
 
-Targets with few known binders fall in the few-shot regime — interpret scores accordingly and calibrate on a first experimental batch.
+Targets with few known binders fall in the few-shot regime, so interpret scores accordingly and calibrate on a first experimental batch.
 
 ## Reproducing the analysis
 
@@ -77,7 +77,7 @@ All experiments are scripted under `src/` and regenerate from the released artef
 - `src/r8_*`, `src/r8b_*` significance, leakage audits, few-shot, baselines, calibration, external/SKEMPI/MM-GBSA
 - `src/r7_figures_final.py` the manuscript figure set
 
-The headline model (`models/lgb_proto.pkl`), the feature matrix, feature columns, and the train/val/test splits are in the repo (`models/`, `features/`, `data/`). The large artefacts — the ESM-2 embeddings and the heavier baseline models (random forest, SVM, fine-tuned ESM-2) — are archived on Zenodo ([10.5281/zenodo.20656437](https://doi.org/10.5281/zenodo.20656437)) to keep the repo lightweight; they are also regenerable from `src/`. Each analysis script in `src/` writes its results to `outputs/` as CSV/JSON, so every reported number is regenerable.
+The headline model (`models/lgb_proto.pkl`), the feature matrix, feature columns, and the train/val/test splits are in the repo (`models/`, `features/`, `data/`). The large artefacts (the ESM-2 embeddings and the heavier baseline models: random forest, SVM, fine-tuned ESM-2) are archived on Zenodo ([10.5281/zenodo.20656437](https://doi.org/10.5281/zenodo.20656437)) to keep the repo lightweight; they are also regenerable from `src/`. Each analysis script in `src/` writes its results to `outputs/` as CSV/JSON, so every reported number is regenerable.
 
 ## Supported targets (24)
 
@@ -101,4 +101,4 @@ Department of Life Sciences, Gachon University, Seongnam, Republic of Korea.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). Training data: ODC-BY (Proteinbase, Adaptyv Bio).
+MIT, see [LICENSE](LICENSE). Training data: ODC-BY (Proteinbase, Adaptyv Bio).

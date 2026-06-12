@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 Batch 1 — core statistical rigor (CPU). Reconstructs base+proto model on
+"""R8 Batch 1 - core statistical rigor (CPU). Reconstructs base+proto model on
 the standard split and runs: leakage audit, label-shuffle control, significance
 test (proto vs base), trivial-feature baselines, enrichment@k, calibration,
 feature-importance stability across seeds."""
@@ -35,7 +35,7 @@ Xfull=np.hstack([fm[base_cols].values.astype(np.float32),P]); Xbase=fm[base_cols
 def fit_pred(X): m=lgb.LGBMClassifier(**LGB); m.fit(X[tr],y[tr]); return m.predict_proba(X[te])[:,1]
 p_full=fit_pred(Xfull); p_base=fit_pred(Xbase); yte=y[te]
 
-print("="*64); print("R8.1 SIGNIFICANCE — proto vs base (paired bootstrap, test n=%d)"%te.sum()); print("="*64)
+print("="*64); print("R8.1 SIGNIFICANCE - proto vs base (paired bootstrap, test n=%d)"%te.sum()); print("="*64)
 au_f,au_b=roc_auc_score(yte,p_full),roc_auc_score(yte,p_base)
 diffs=[]
 idx=np.arange(len(yte))
@@ -52,7 +52,7 @@ ys=y.copy(); ys[tr]=rng.permutation(ys[tr])
 ms=lgb.LGBMClassifier(**LGB); ms.fit(Xfull[tr],ys[tr]); ps=ms.predict_proba(Xfull[te])[:,1]
 print(f"  AUROC with shuffled train labels = {roc_auc_score(yte,ps):.3f}  (expect ~0.5; real model={au_f:.3f})")
 
-print("\n"+"="*64); print("R8.3 TRIVIAL BASELINES — single feature as classifier (test)"); print("="*64)
+print("\n"+"="*64); print("R8.3 TRIVIAL BASELINES - single feature as classifier (test)"); print("="*64)
 allc=base_cols+["proto_cos_pos","proto_cos_neg","proto_l2_pos","proto_disc_proj","proto_ratio","proto_n_pos","proto_n_neg"]
 Xte_full=Xfull[te]
 for f in ["method_success_rate","esmfold_plddt","proteinmpnn_score"]:
@@ -69,7 +69,7 @@ for kfrac in [0.05,0.10,0.20]:
     k=max(1,int(kfrac*len(yte))); hits=yte[order[:k]].sum(); prec=hits/k
     print(f"  top {int(kfrac*100):2d}% (n={k:3d}): precision={prec:.3f}  enrichment={prec/base_rate:.2f}x over base rate {base_rate:.3f}")
 
-print("\n"+"="*64); print("R8.5 LEAKAGE AUDIT — test AUROC vs max train-test sequence similarity"); print("="*64)
+print("\n"+"="*64); print("R8.5 LEAKAGE AUDIT - test AUROC vs max train-test sequence similarity"); print("="*64)
 def kmers(s,k=5): s=str(s); return set(s[i:i+k] for i in range(len(s)-k+1))
 trkm=[kmers(s) for s in fm.sequence.values[tr]]
 sims=[]

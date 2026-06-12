@@ -1,5 +1,5 @@
 """
-protbind.ai_explain — RATAN-PBind LLM-augmented interpretability via Groq Cloud
+protbind.ai_explain - RATAN-PBind LLM-augmented interpretability via Groq Cloud
 
 Bridges ML predictions with mechanistic scientific reasoning.
 The ML model answers WHAT; the LLM answers WHY.
@@ -15,7 +15,7 @@ _SYSTEM = """You are RATAN-PBind AI, a computational biology expert specialising
 protein-protein interactions, de novo protein binder design, and structural biology.
 
 You receive structured quantitative output from an ML binding predictor and your job
-is to provide rigorous, molecularly specific scientific interpretation — not generic
+is to provide rigorous, molecularly specific scientific interpretation - not generic
 advice. Every statement must be grounded in the data provided to you.
 
 Rules:
@@ -78,7 +78,7 @@ def build_prediction_prompt(
     shap_block   = _shap_table(top_features)
     physico_block = _physico_block(top_features, all_feat_cols, feat_vec)
 
-    prompt = f"""Protein binding prediction — requires scientific interpretation.
+    prompt = f"""Protein binding prediction - requires scientific interpretation.
 
 ═══ PREDICTION ════════════════════════════════════════════════════════
 Sequence        : {sequence[:80]}{'...' if len(sequence) > 80 else ''}
@@ -101,8 +101,8 @@ Binder / non-binder ratio (proto_ratio): {result['proto_ratio']:.4f}
 {physico_block}
 
 ═══ TASK ════════════════════════════════════════════════════════════
-1. Write a 3–5 sentence mechanistic interpretation of WHY this sequence
-   is predicted to {binding_word} {target}. Be specific — cite feature
+1. Write a 3-5 sentence mechanistic interpretation of WHY this sequence
+   is predicted to {binding_word} {target}. Be specific - cite feature
    names and values. Explain the molecular basis, not just the statistics.
 
 2. Provide exactly 3 concrete, chemically specific recommendations to
@@ -149,12 +149,12 @@ Baseline prob: {baseline_prob:.2%}
 {mut_lines}
 
 ═══ TASK ════════════════════════════════════════════════════════════
-For each mutation listed, provide a brief biochemical rationale (1–2 sentences)
+For each mutation listed, provide a brief biochemical rationale (1-2 sentences)
 explaining WHY this substitution is predicted to improve binding to {target}.
 Consider: charge complementarity, hydrophobicity, backbone flexibility (proline/glycine),
 hydrogen bonding capacity, steric effects, and known binding interface properties.
 
-Then write 2–3 sentences on a recommended experimental validation strategy for the
+Then write 2-3 sentences on a recommended experimental validation strategy for the
 top-ranked mutations.
 
 Format:
@@ -165,7 +165,7 @@ Format:
 ... (for each mutation)
 
 **Experimental Validation Strategy**
-[2–3 sentences]
+[2-3 sentences]
 """
     return prompt
 
@@ -183,7 +183,7 @@ def build_batch_prompt(
         for i, c in enumerate(top_candidates)
     )
 
-    prompt = f"""Batch protein binding prediction results — requires scientific summary.
+    prompt = f"""Batch protein binding prediction results - requires scientific summary.
 
 ═══ BATCH OVERVIEW ════════════════════════════════════════════════════
 Target         : {target}
@@ -195,10 +195,10 @@ Predicted binders: {n_binders} ({hit_rate:.1%} hit rate)
 
 ═══ TASK ══════════════════════════════════════════════════════════════
 1. Interpret the overall hit rate for {target} (is {hit_rate:.1%} high/low relative to
-   typical binder design campaigns, which average 10–30%?).
+   typical binder design campaigns, which average 10-30%?).
 2. Comment on what the top candidates' proto_ratio values suggest about
    their similarity to known binders.
-3. Recommend which 1–3 candidates to prioritise for experimental follow-up
+3. Recommend which 1-3 candidates to prioritise for experimental follow-up
    and why.
 4. Suggest one improvement to the design strategy based on this batch.
 
@@ -255,7 +255,7 @@ def ai_explain_prediction(
 
     Returns
     -------
-    str — markdown-formatted AI analysis
+    str - markdown-formatted AI analysis
     """
     prompt = build_prediction_prompt(
         sequence, target, result, top_features, all_feat_cols, feat_vec)
@@ -327,7 +327,7 @@ def build_design_prompt(
         "combined":  "Combined pipeline: Directed Evolution → ESM-2 Refinement",
     }.get(mode, mode)
 
-    prompt = f"""Generative protein binder design results — requires scientific interpretation.
+    prompt = f"""Generative protein binder design results - requires scientific interpretation.
 
 ═══ DESIGN RUN ════════════════════════════════════════════════════════
 Method       : {mode_desc}
@@ -344,17 +344,17 @@ Relative improvement       : +{improvement/max(seed_prob,0.001):.0%}
 ═══ TOP 5 DESIGNED SEQUENCES ══════════════════════════════════════════
 {top_lines}
 
-═══ BEST SEQUENCE — SHAP FEATURE ATTRIBUTION ═════════════════════════
+═══ BEST SEQUENCE - SHAP FEATURE ATTRIBUTION ═════════════════════════
 {shap_lines}
 
-═══ BEST SEQUENCE — KEY PROPERTIES ══════════════════════════════════
+═══ BEST SEQUENCE - KEY PROPERTIES ══════════════════════════════════
 Binding probability : {best_result.get('probability', best_prob):.2%}
 Confidence          : {best_result.get('confidence', 'N/A')}
 Similarity to binders (proto_cos_pos): {best_result.get('proto_cos_pos', 0):.4f}
 Binder/non-binder ratio (proto_ratio): {best_result.get('proto_ratio', 0):.4f}
 
 ═══ TASK ════════════════════════════════════════════════════════════
-1. Explain in 3–4 sentences what the design algorithm achieved:
+1. Explain in 3-4 sentences what the design algorithm achieved:
    - What sequence changes occurred (seed vs best)?
    - Why did binding probability improve?
    - What does the proto_ratio and SHAP profile tell us about
@@ -365,14 +365,14 @@ Binder/non-binder ratio (proto_ratio): {best_result.get('proto_ratio', 0):.4f}
    - What is the risk of overfitting to the ML oracle?
    - Are there any properties that could limit experimental success?
 
-3. Recommend a concrete experimental validation strategy (2–3 steps).
+3. Recommend a concrete experimental validation strategy (2-3 steps).
 
 Format:
 **Design Outcome**
-[3–4 sentences]
+[3-4 sentences]
 
 **Quality Assessment**
-[3–4 sentences]
+[3-4 sentences]
 
 **Experimental Validation**
 1. [step]

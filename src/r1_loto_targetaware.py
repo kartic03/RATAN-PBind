@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1.5a — LOTO test of target-aware INTERACTION features (LightGBM).
+"""R1.5a - LOTO test of target-aware INTERACTION features (LightGBM).
 A: target-blind 463 base. B: + [cos,L2,dot](binder,target) + PCA32(binder⊙target).
 research env. Portable ROOT. -> outputs/r1_loto_targetaware.csv"""
 import os, json, time, warnings, numpy as np, pandas as pd

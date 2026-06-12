@@ -1,4 +1,4 @@
-# RATAN-PBind — runtime + analysis dependencies
+# RATAN-PBind - runtime + analysis dependencies
 # For a fully reproducible, locked environment use pixi instead (pixi.toml / pixi.lock).
 # PyTorch is CPU by default; for CUDA install from the cu121 index:
 #   pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cu121

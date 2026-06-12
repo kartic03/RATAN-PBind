@@ -8,12 +8,12 @@ knew the TARGET by a 1-hot label or a proxy prototype. True molecular recognitio
 requires knowing BOTH binder and target in the same embedding space.
 
 New features per (binder, target) pair:
-  1. tgt_cos_sim       — cosine similarity between binder and target ESM-2
-  2. tgt_l2_dist       — L2 distance in ESM-2 space
-  3. tgt_dot_prod      — unnormalized dot product
-  4. tgt_norm          — L2 norm of target embedding (proxy for size/complexity)
-  5. binder_norm       — L2 norm of binder embedding
-  6-21. tgt_pca_01..16 — top 16 PCA components of (binder × target) element-wise
+  1. tgt_cos_sim       - cosine similarity between binder and target ESM-2
+  2. tgt_l2_dist       - L2 distance in ESM-2 space
+  3. tgt_dot_prod      - unnormalized dot product
+  4. tgt_norm          - L2 norm of target embedding (proxy for size/complexity)
+  5. binder_norm       - L2 norm of binder embedding
+  6-21. tgt_pca_01..16 - top 16 PCA components of (binder × target) element-wise
                           product (fitted on training pairs only)
 
 LOTO improvement:
@@ -115,10 +115,10 @@ for tgt in all_targets:
             print(f"  {tgt:<45} {acc}  len={len(seq)}")
         else:
             target_sequences[tgt] = None
-            print(f"  {tgt:<45} {acc}  FETCH FAILED — zero-vector")
+            print(f"  {tgt:<45} {acc}  FETCH FAILED - zero-vector")
     else:
         target_sequences[tgt] = None
-        print(f"  {tgt:<45} no UniProt ID — zero-vector fallback")
+        print(f"  {tgt:<45} no UniProt ID - zero-vector fallback")
 
 n_found = sum(1 for v in target_sequences.values() if v)
 print(f"\n  Found sequences: {n_found}/{len(all_targets)}")
@@ -135,7 +135,7 @@ print(f"  ESM-2 loaded from local cache: esm2_t33_650M_UR50D")
 
 # Manual tokenize workaround for Python 3.13 compatibility (avoids segfault)
 def manual_tokenize(seqs, max_len=1022):
-    """Safe tokenizer for Python 3.13 — avoids fair-esm batch converter segfault."""
+    """Safe tokenizer for Python 3.13 - avoids fair-esm batch converter segfault."""
     prepend = alphabet.prepend_bos
     append  = alphabet.append_eos
     pad_idx = alphabet.padding_idx
@@ -179,7 +179,7 @@ np.save(MODELS_DIR / "target_esm2_embeddings.npy",
         np.stack([target_emb[t] for t in all_targets]))
 print(f"\n  Saved target ESM-2 embeddings: {len(all_targets)} × 1280")
 
-# Free GPU memory — we'll use binder embeddings next
+# Free GPU memory - we'll use binder embeddings next
 del esm_model_loaded
 torch.cuda.empty_cache()
 
@@ -246,7 +246,7 @@ print(f"  PCA explained variance ratio (cumulative): "
 inter_feats = np.concatenate([scalars, pca_feats], axis=1)
 print(f"  Interaction features shape: {inter_feats.shape}  "
       f"({len(INTER_FEAT_COLS)} features)")
-print(f"  Sample val tgt_cos_sim — mean={scalars[val_m, 0].mean():.4f}  "
+print(f"  Sample val tgt_cos_sim - mean={scalars[val_m, 0].mean():.4f}  "
       f"std={scalars[val_m, 0].std():.4f}")
 
 # ── 5. Build augmented feature matrix ─────────────────────────────────────────
@@ -408,8 +408,8 @@ lgb_6e.fit(X_tr, y_tr, eval_set=[(X_v, y_v)],
 lgb_vp = lgb_6e.predict_proba(X_v)[:, 1]
 lgb_tp = lgb_6e.predict_proba(X_te)[:, 1]
 m_lgb_v = mets(y_v, lgb_vp); m_lgb_t = mets(y_te, lgb_tp)
-print(f"  LightGBM+Interaction Val  — AUROC={m_lgb_v['auroc']:.4f}  AUPRC={m_lgb_v['auprc']:.4f}  F1={m_lgb_v['f1']:.4f}  MCC={m_lgb_v['mcc']:.4f}")
-print(f"  LightGBM+Interaction Test — AUROC={m_lgb_t['auroc']:.4f}  AUPRC={m_lgb_t['auprc']:.4f}  F1={m_lgb_t['f1']:.4f}  MCC={m_lgb_t['mcc']:.4f}")
+print(f"  LightGBM+Interaction Val  - AUROC={m_lgb_v['auroc']:.4f}  AUPRC={m_lgb_v['auprc']:.4f}  F1={m_lgb_v['f1']:.4f}  MCC={m_lgb_v['mcc']:.4f}")
+print(f"  LightGBM+Interaction Test - AUROC={m_lgb_t['auroc']:.4f}  AUPRC={m_lgb_t['auprc']:.4f}  F1={m_lgb_t['f1']:.4f}  MCC={m_lgb_t['mcc']:.4f}")
 joblib.dump(lgb_6e, MODELS_DIR / "lgb_interaction.pkl")
 
 # Feature importance: where do interaction features rank?
@@ -433,8 +433,8 @@ xgb_6e.fit(X_tr, y_tr, eval_set=[(X_v, y_v)], verbose=False)
 xgb_vp = xgb_6e.predict_proba(X_v)[:, 1]
 xgb_tp = xgb_6e.predict_proba(X_te)[:, 1]
 m_xgb_v = mets(y_v, xgb_vp); m_xgb_t = mets(y_te, xgb_tp)
-print(f"  XGBoost+Interaction Val  — AUROC={m_xgb_v['auroc']:.4f}  AUPRC={m_xgb_v['auprc']:.4f}  F1={m_xgb_v['f1']:.4f}  MCC={m_xgb_v['mcc']:.4f}")
-print(f"  XGBoost+Interaction Test — AUROC={m_xgb_t['auroc']:.4f}  AUPRC={m_xgb_t['auprc']:.4f}  F1={m_xgb_t['f1']:.4f}  MCC={m_xgb_t['mcc']:.4f}")
+print(f"  XGBoost+Interaction Val  - AUROC={m_xgb_v['auroc']:.4f}  AUPRC={m_xgb_v['auprc']:.4f}  F1={m_xgb_v['f1']:.4f}  MCC={m_xgb_v['mcc']:.4f}")
+print(f"  XGBoost+Interaction Test - AUROC={m_xgb_t['auroc']:.4f}  AUPRC={m_xgb_t['auprc']:.4f}  F1={m_xgb_t['f1']:.4f}  MCC={m_xgb_t['mcc']:.4f}")
 joblib.dump(xgb_6e, MODELS_DIR / "xgb_interaction.pkl")
 
 # ── 7. LOTO CV with real target embeddings ───────────────────────────────────
@@ -573,7 +573,7 @@ print(f"  Delta (6e vs 6c): {valid['auroc_with_tgt'].mean() - 0.6584:+.4f}")
 
 # ── 8. Final summary ──────────────────────────────────────────────────────────
 print("\n" + "=" * 70)
-print("PHASE 6e — FINAL SUMMARY (TEST SET)")
+print("PHASE 6e - FINAL SUMMARY (TEST SET)")
 print(f"  {'Model':<55}  {'AUROC':>7}  {'AUPRC':>7}  {'F1':>7}  {'MCC':>7}")
 print("  " + "-" * 85)
 print(f"  {'LightGBM+Proto (Phase 6b best)':<55}  {0.9402:>7.4f}  {0.7645:>7.4f}  {0.7481:>7.4f}  {0.6979:>7.4f}")

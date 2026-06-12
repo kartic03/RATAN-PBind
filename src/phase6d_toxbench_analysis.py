@@ -4,12 +4,12 @@ Multi-Target Protein Binding Predictor
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
 
 Applies methodology from ToxBench (Kartic et al.) to the protein binding domain:
-1. Multi-seed evaluation (5 seeds) — AUROC ± std, model stability
-2. ECE + reliability diagrams — calibration quality (before/after Platt)
-3. Applicability domain — ESM-2 NN similarity vs AUROC (explains LOTO gap)
-4. Uncertainty quantification — confidence-filtering curve
-5. SHAP analysis — prototype feature biological interpretation
-6. Sequence identity leakage check — validate split integrity
+1. Multi-seed evaluation (5 seeds) - AUROC ± std, model stability
+2. ECE + reliability diagrams - calibration quality (before/after Platt)
+3. Applicability domain - ESM-2 NN similarity vs AUROC (explains LOTO gap)
+4. Uncertainty quantification - confidence-filtering curve
+5. SHAP analysis - prototype feature biological interpretation
+6. Sequence identity leakage check - validate split integrity
 """
 
 import numpy as np
@@ -277,10 +277,10 @@ def max_jaccard(query_seqs, ref_kmers, sample_n=200):
 val_max_j  = max_jaccard(val_seqs,  train_kmers, sample_n=500)
 test_max_j = max_jaccard(test_seqs, train_kmers, sample_n=500)
 
-print(f"  Val  max Jaccard to train — mean={val_max_j.mean():.3f}  "
+print(f"  Val  max Jaccard to train - mean={val_max_j.mean():.3f}  "
       f"median={np.median(val_max_j):.3f}  p95={np.percentile(val_max_j,95):.3f}  "
       f"max={val_max_j.max():.3f}")
-print(f"  Test max Jaccard to train — mean={test_max_j.mean():.3f}  "
+print(f"  Test max Jaccard to train - mean={test_max_j.mean():.3f}  "
       f"median={np.median(test_max_j):.3f}  p95={np.percentile(test_max_j,95):.3f}  "
       f"max={test_max_j.max():.3f}")
 
@@ -312,8 +312,8 @@ XGB_PARAMS = dict(
 )
 
 seed_results   = []
-all_val_probs  = []   # (n_seeds, n_val)  — for uncertainty on val
-all_test_probs = []   # (n_seeds*2, n_test) — LGB+XGB across all seeds
+all_val_probs  = []   # (n_seeds, n_val)  - for uncertainty on val
+all_test_probs = []   # (n_seeds*2, n_test) - LGB+XGB across all seeds
 
 lgb_val_probs_seeds  = []
 lgb_test_probs_seeds = []
@@ -376,12 +376,12 @@ all_aurocs  = [r["test_auroc"] for r in seed_results]
 
 print("\n" + "-" * 60)
 print("MULTI-SEED SUMMARY (TEST SET)")
-print(f"  LightGBM  — mean={np.mean(lgb_aurocs):.4f} ± {np.std(lgb_aurocs):.4f}  "
+print(f"  LightGBM  - mean={np.mean(lgb_aurocs):.4f} ± {np.std(lgb_aurocs):.4f}  "
       f"[{min(lgb_aurocs):.4f}, {max(lgb_aurocs):.4f}]")
-print(f"  XGBoost   — mean={np.mean(xgb_aurocs):.4f} ± {np.std(xgb_aurocs):.4f}  "
+print(f"  XGBoost   - mean={np.mean(xgb_aurocs):.4f} ± {np.std(xgb_aurocs):.4f}  "
       f"[{min(xgb_aurocs):.4f}, {max(xgb_aurocs):.4f}]")
-print(f"  Combined  — mean={np.mean(all_aurocs):.4f} ± {np.std(all_aurocs):.4f}")
-print(f"  10-model ensemble — AUROC={ens_tm['auroc']:.4f}  AUPRC={ens_tm['auprc']:.4f}  "
+print(f"  Combined  - mean={np.mean(all_aurocs):.4f} ± {np.std(all_aurocs):.4f}")
+print(f"  10-model ensemble - AUROC={ens_tm['auroc']:.4f}  AUPRC={ens_tm['auprc']:.4f}  "
       f"F1={ens_tm['f1']:.4f}  MCC={ens_tm['mcc']:.4f}")
 
 # ── 5. ECE + Calibration Curves ───────────────────────────────────────────────
@@ -404,7 +404,7 @@ print(f"  ECE before calibration : {ece_raw:.4f}")
 print(f"  ECE after Platt scaling: {ece_cal:.4f}  ({100*(ece_raw-ece_cal)/ece_raw:.1f}% reduction)")
 
 cal_tm = mets(y_te, cal_test_p)
-print(f"  Calibrated ensemble — AUROC={cal_tm['auroc']:.4f}  AUPRC={cal_tm['auprc']:.4f}  "
+print(f"  Calibrated ensemble - AUROC={cal_tm['auroc']:.4f}  AUPRC={cal_tm['auprc']:.4f}  "
       f"F1={cal_tm['f1']:.4f}  MCC={cal_tm['mcc']:.4f}")
 
 # Reliability diagram data
@@ -417,7 +417,7 @@ print("Uncertainty Quantification (confidence-based filtering)...")
 
 # Uncertainty = std across all 10 model predictions
 uncertainty_test = all_test_arr.std(0)  # (n_test,)
-print(f"  Uncertainty (std) — mean={uncertainty_test.mean():.4f}  "
+print(f"  Uncertainty (std) - mean={uncertainty_test.mean():.4f}  "
       f"max={uncertainty_test.max():.4f}  p90={np.percentile(uncertainty_test,90):.4f}")
 
 # Confidence-filtering curve
@@ -445,11 +445,11 @@ print("Applicability Domain Analysis (prototype cosine similarity to known binde
 
 # AD metric: proto_cos_pos (cosine similarity to positive prototype of the target)
 # This measures how "in-domain" a test protein is relative to known binders
-# It is already computed as a feature — extract from X_te
+# It is already computed as a feature - extract from X_te
 proto_cos_pos_idx = all_feat_cols.index("proto_cos_pos")
 nn_sim = X_te[:, proto_cos_pos_idx]   # (n_test,)
 
-print(f"  Proto cos-pos similarity — mean={nn_sim.mean():.3f}  "
+print(f"  Proto cos-pos similarity - mean={nn_sim.mean():.3f}  "
       f"median={np.median(nn_sim):.3f}  min={nn_sim.min():.3f}  max={nn_sim.max():.3f}")
 
 # Bin test set into quartiles by NN similarity
@@ -658,7 +658,7 @@ print("  Saved: phase6d_shap.png")
 
 # ── 10. Final Summary ─────────────────────────────────────────────────────────
 print("\n" + "=" * 70)
-print("PHASE 6d — FINAL SUMMARY")
+print("PHASE 6d - FINAL SUMMARY")
 print(f"\n  MULTI-SEED STABILITY (5 seeds × 2 models, Test AUROC):")
 print(f"    LightGBM+Proto : {np.mean(lgb_aurocs):.4f} ± {np.std(lgb_aurocs):.4f}")
 print(f"    XGBoost+Proto  : {np.mean(xgb_aurocs):.4f} ± {np.std(xgb_aurocs):.4f}")

@@ -36,7 +36,7 @@ PKA_SIDE = {"D": 3.9, "E": 4.1, "H": 6.0, "C": 8.3, "Y": 10.1, "K": 10.5, "R": 1
 PKA_NTERM = 8.0
 PKA_CTERM = 3.1
 
-# Instability index DIWV table (Guruprasad et al. 1990) — dipeptide weights
+# Instability index DIWV table (Guruprasad et al. 1990) - dipeptide weights
 # Full 400-entry table; only non-zero entries listed, rest default to 0
 DIWV = {
     "WW": 1.0, "WC": 1.0, "WM": 24.68, "WH": 24.68, "WY": 1.0,

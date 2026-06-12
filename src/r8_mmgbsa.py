@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""#20 — REAL physics: MM-GBSA single-trajectory binding free energy on the R4
+"""#20 - REAL physics: MM-GBSA single-trajectory binding free energy on the R4
 Boltz-2 complex structures (chain A=binder, B=target). GBn2 implicit solvent.
 ΔG_bind = E_complex - E_binderAlone - E_targetAlone. Independent of Boltz. mmgbsa env."""
 import glob, os, warnings, numpy as np, pandas as pd

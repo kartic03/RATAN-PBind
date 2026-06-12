@@ -1,5 +1,5 @@
 """
-protbind.features — RATAN-PBind feature extraction for new protein sequences
+protbind.features - RATAN-PBind feature extraction for new protein sequences
 Computes all handcrafted features from a raw amino acid sequence.
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
 """

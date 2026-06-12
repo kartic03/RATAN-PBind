@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1.3 — ESM-2 target embeddings (corrected seqs).
+"""R1.3 - ESM-2 target embeddings (corrected seqs).
 Saves models/target_emb_v2_whole.npy (24x1280), target_emb_v2_slugs.json,
 and models/target_perres.npz (per-residue, all 24). base env (torch+fair-esm).
 Portable ROOT; chunks sequences > 1020 for the ESM-2 position budget."""

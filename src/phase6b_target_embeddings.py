@@ -13,18 +13,18 @@ Why this works:
   - This is essentially prototype networks (Snell et al. 2017) applied to protein binding
 
 Features added (7 scalar):
-  1. proto_cos_pos   — cosine sim to positive prototype (known binders)
-  2. proto_cos_neg   — cosine sim to negative prototype (known non-binders)
-  3. proto_l2_pos    — L2 distance to positive prototype
-  4. proto_disc_proj — projection onto discriminative axis (pos_proto - neg_proto)
-  5. proto_ratio     — proto_cos_pos / (proto_cos_neg + ε)
-  6. proto_n_pos     — number of training positives for this target (prototype reliability)
-  7. proto_n_neg     — number of training negatives for this target
+  1. proto_cos_pos   - cosine sim to positive prototype (known binders)
+  2. proto_cos_neg   - cosine sim to negative prototype (known non-binders)
+  3. proto_l2_pos    - L2 distance to positive prototype
+  4. proto_disc_proj - projection onto discriminative axis (pos_proto - neg_proto)
+  5. proto_ratio     - proto_cos_pos / (proto_cos_neg + ε)
+  6. proto_n_pos     - number of training positives for this target (prototype reliability)
+  7. proto_n_neg     - number of training negatives for this target
 
 TargetAwareMLP variant: uses 1280-dim prototype as target context
 (much richer than 32-dim learned embedding)
 
-No external data needed — completely self-contained.
+No external data needed - completely self-contained.
 """
 
 import numpy as np
@@ -199,7 +199,7 @@ else:
     all_feat_cols = base_feat_cols
 
 # Rebuild augmented feat_mat for classical ML (Phase 6a + prototype features)
-# Load feature matrix (Phase 3 style — already imputed)
+# Load feature matrix (Phase 3 style - already imputed)
 fm = feat_mat_base.copy()
 
 # Add prototype features to fm aligned by protein_id + target
@@ -332,11 +332,11 @@ lgb_val_p  = lgb_6b.predict_proba(X_v)[:, 1]
 lgb_test_p = lgb_6b.predict_proba(X_te)[:, 1]
 m_lgb_v = metrics(y_v,  lgb_val_p)
 m_lgb_t = metrics(y_te, lgb_test_p)
-print(f"  LightGBM+Proto Val  — AUROC={m_lgb_v[0]:.4f}  AUPRC={m_lgb_v[1]:.4f}  F1={m_lgb_v[2]:.4f}  MCC={m_lgb_v[3]:.4f}")
-print(f"  LightGBM+Proto Test — AUROC={m_lgb_t[0]:.4f}  AUPRC={m_lgb_t[1]:.4f}  F1={m_lgb_t[2]:.4f}  MCC={m_lgb_t[3]:.4f}")
+print(f"  LightGBM+Proto Val  - AUROC={m_lgb_v[0]:.4f}  AUPRC={m_lgb_v[1]:.4f}  F1={m_lgb_v[2]:.4f}  MCC={m_lgb_v[3]:.4f}")
+print(f"  LightGBM+Proto Test - AUROC={m_lgb_t[0]:.4f}  AUPRC={m_lgb_t[1]:.4f}  F1={m_lgb_t[2]:.4f}  MCC={m_lgb_t[3]:.4f}")
 joblib.dump(lgb_6b, MODELS_DIR / "lgb_proto.pkl")
 
-# Feature importance — check proto features
+# Feature importance - check proto features
 fi = lgb_6b.feature_importances_
 fi_df = pd.DataFrame({"feature": all_feat_cols, "importance": fi}).sort_values("importance", ascending=False)
 proto_ranks = fi_df[fi_df["feature"].isin(proto_feat_cols)][["feature", "importance"]]
@@ -361,8 +361,8 @@ xgb_val_p  = xgb_6b.predict_proba(X_v)[:, 1]
 xgb_test_p = xgb_6b.predict_proba(X_te)[:, 1]
 m_xgb_v = metrics(y_v,  xgb_val_p)
 m_xgb_t = metrics(y_te, xgb_test_p)
-print(f"  XGBoost+Proto Val  — AUROC={m_xgb_v[0]:.4f}  AUPRC={m_xgb_v[1]:.4f}  F1={m_xgb_v[2]:.4f}  MCC={m_xgb_v[3]:.4f}")
-print(f"  XGBoost+Proto Test — AUROC={m_xgb_t[0]:.4f}  AUPRC={m_xgb_t[1]:.4f}  F1={m_xgb_t[2]:.4f}  MCC={m_xgb_t[3]:.4f}")
+print(f"  XGBoost+Proto Val  - AUROC={m_xgb_v[0]:.4f}  AUPRC={m_xgb_v[1]:.4f}  F1={m_xgb_v[2]:.4f}  MCC={m_xgb_v[3]:.4f}")
+print(f"  XGBoost+Proto Test - AUROC={m_xgb_t[0]:.4f}  AUPRC={m_xgb_t[1]:.4f}  F1={m_xgb_t[2]:.4f}  MCC={m_xgb_t[3]:.4f}")
 joblib.dump(xgb_6b, MODELS_DIR / "xgb_proto.pkl")
 
 # ── TargetAwareMLP with 1280-dim prototype target context ─────────────────────
@@ -487,8 +487,8 @@ def eval_proto_mlp(model, X, t_idx, y, mask):
 
 mlp_val  = eval_proto_mlp(model_proto, X_comb_6b, t_idx_6b, y_bind_6b, val_m)
 mlp_test = eval_proto_mlp(model_proto, X_comb_6b, t_idx_6b, y_bind_6b, test_m)
-print(f"  ProtoTargetMLP Val  — AUROC={mlp_val[0]:.4f}  AUPRC={mlp_val[1]:.4f}  F1={mlp_val[2]:.4f}  MCC={mlp_val[3]:.4f}")
-print(f"  ProtoTargetMLP Test — AUROC={mlp_test[0]:.4f}  AUPRC={mlp_test[1]:.4f}  F1={mlp_test[2]:.4f}  MCC={mlp_test[3]:.4f}")
+print(f"  ProtoTargetMLP Val  - AUROC={mlp_val[0]:.4f}  AUPRC={mlp_val[1]:.4f}  F1={mlp_val[2]:.4f}  MCC={mlp_val[3]:.4f}")
+print(f"  ProtoTargetMLP Test - AUROC={mlp_test[0]:.4f}  AUPRC={mlp_test[1]:.4f}  F1={mlp_test[2]:.4f}  MCC={mlp_test[3]:.4f}")
 
 # ── Ensemble: all 6b models ───────────────────────────────────────────────────
 print("\n" + "="*70)
@@ -553,14 +553,14 @@ for w0 in np.arange(0.1, 0.6, 0.1):
 res   = minimize(neg_ap, best_w0, method='Nelder-Mead',
                  options={'xatol':1e-5, 'fatol':1e-5, 'maxiter':2000})
 w_opt = np.abs(res.x) / np.abs(res.x).sum()
-print(f"  Weights — LGB_Proto:{w_opt[0]:.3f}  XGB_Proto:{w_opt[1]:.3f}  XGB_6a:{w_opt[2]:.3f}  MLP_Proto:{w_opt[3]:.3f}")
+print(f"  Weights - LGB_Proto:{w_opt[0]:.3f}  XGB_Proto:{w_opt[1]:.3f}  XGB_6a:{w_opt[2]:.3f}  MLP_Proto:{w_opt[3]:.3f}")
 
 ens_val_p  = (val_stack  * w_opt).sum(1)
 ens_test_p = (test_stack * w_opt).sum(1)
 m_ens_v    = metrics(y_v,  ens_val_p)
 m_ens_t    = metrics(y_te, ens_test_p)
-print(f"  Ensemble Val  — AUROC={m_ens_v[0]:.4f}  AUPRC={m_ens_v[1]:.4f}  F1={m_ens_v[2]:.4f}  MCC={m_ens_v[3]:.4f}")
-print(f"  Ensemble Test — AUROC={m_ens_t[0]:.4f}  AUPRC={m_ens_t[1]:.4f}  F1={m_ens_t[2]:.4f}  MCC={m_ens_t[3]:.4f}")
+print(f"  Ensemble Val  - AUROC={m_ens_v[0]:.4f}  AUPRC={m_ens_v[1]:.4f}  F1={m_ens_v[2]:.4f}  MCC={m_ens_v[3]:.4f}")
+print(f"  Ensemble Test - AUROC={m_ens_t[0]:.4f}  AUPRC={m_ens_t[1]:.4f}  F1={m_ens_t[2]:.4f}  MCC={m_ens_t[3]:.4f}")
 
 # Platt calibration + per-target threshold
 cal = LogisticRegression(C=1.0, solver='lbfgs', max_iter=500, random_state=RANDOM_SEED)
@@ -569,8 +569,8 @@ cal_val_p  = cal.predict_proba(ens_val_p.reshape(-1, 1))[:, 1]
 cal_test_p = cal.predict_proba(ens_test_p.reshape(-1, 1))[:, 1]
 m_cal_v    = metrics(y_v,  cal_val_p)
 m_cal_t    = metrics(y_te, cal_test_p)
-print(f"  Calibrated Val  — AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
-print(f"  Calibrated Test — AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
+print(f"  Calibrated Val  - AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
+print(f"  Calibrated Test - AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
 
 val_tgts  = pairs_aug_6b["target"].values[val_m]
 test_tgts = pairs_aug_6b["target"].values[test_m]
@@ -599,7 +599,7 @@ mcc_pt   = matthews_corrcoef(y_te, y_pred_pt)
 
 # ── Final summary ──────────────────────────────────────────────────────────────
 print("\n" + "="*70)
-print("PHASE 6b — FINAL SUMMARY (TEST SET)")
+print("PHASE 6b - FINAL SUMMARY (TEST SET)")
 print(f"  {'Model':<50}  {'AUROC':>7}  {'AUPRC':>7}  {'F1':>7}  {'MCC':>7}")
 print("  " + "-"*82)
 print(f"  {'--- Historical bests ---':<50}")

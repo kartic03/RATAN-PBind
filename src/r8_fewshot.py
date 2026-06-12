@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 Batch 2 — few-shot recovery curve. For a held-out target (LOTO), build its
+"""R8 Batch 2 - few-shot recovery curve. For a held-out target (LOTO), build its
 prototype from k known binders+non-binders ('shots'), predict the remaining pairs.
 Shows AUROC recovery vs k => deployment guideline for new targets. CPU."""
 import warnings, numpy as np, pandas as pd

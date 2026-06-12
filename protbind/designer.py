@@ -1,9 +1,9 @@
 """
-protbind.designer — RATAN-PBind Generative AI protein binder design
+protbind.designer - RATAN-PBind Generative AI protein binder design
 
 Two engines:
-  1. Directed Evolution  — RATAN-PBind as fitness oracle (genetic algorithm)
-  2. ESM-2 Redesign      — ESM-2 protein LM as generative model (masked prediction)
+  1. Directed Evolution  - RATAN-PBind as fitness oracle (genetic algorithm)
+  2. ESM-2 Redesign      - ESM-2 protein LM as generative model (masked prediction)
 
 Combined pipeline: Evolution → ESM-2 refinement → Groq AI interpretation
 
@@ -269,7 +269,7 @@ class ProtBindDesigner:
         """
         ESM-2 protein language model guided sequence redesign.
 
-        Round 0 (SHAP-guided): masks amino acid types with negative SHAP —
+        Round 0 (SHAP-guided): masks amino acid types with negative SHAP -
           directly targets the sequence features hurting the prediction.
         Rounds 1+ (random masking): randomly masks mask_fraction of positions
           and samples from ESM-2's learned protein sequence distribution.

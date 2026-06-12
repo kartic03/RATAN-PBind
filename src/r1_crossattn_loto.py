@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R1.4/R1.5 — cross-attention binder x target model, LOTO.
+"""R1.4/R1.5 - cross-attention binder x target model, LOTO.
 Binder mean-pool (query) cross-attends over target per-residue ESM-2 (K/V)
 -> context -> MLP -> binding logit. PURE (target-aware only) + HYBRID (+463 base).
 base env (torch+CUDA). Portable ROOT. -> outputs/r1_xattn_loto_{pure,hybrid}.csv"""

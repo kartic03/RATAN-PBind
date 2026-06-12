@@ -58,7 +58,7 @@ val_df   = fm[fm["split"] == "val"].reset_index(drop=True)
 test_df  = fm[fm["split"] == "test"].reset_index(drop=True)
 
 log(f"  Proteins: {len(proteins_df):,}")
-log(f"  Pairs — Train: {len(train_df):,} | Val: {len(val_df):,} | Test: {len(test_df):,}")
+log(f"  Pairs - Train: {len(train_df):,} | Val: {len(val_df):,} | Test: {len(test_df):,}")
 
 # ── Step 1: Generate ESM-2 embeddings ─────────────────────────────────────────
 
@@ -66,7 +66,7 @@ EMB_PATH = FEAT_DIR / "esm2_embeddings.npy"
 ID_PATH  = FEAT_DIR / "esm2_protein_ids.npy"
 
 if EMB_PATH.exists() and ID_PATH.exists():
-    log("\nFound cached ESM-2 embeddings — loading...")
+    log("\nFound cached ESM-2 embeddings - loading...")
     embeddings   = np.load(EMB_PATH)
     protein_ids  = np.load(ID_PATH, allow_pickle=True)
     log(f"  Loaded: {embeddings.shape}")
@@ -483,7 +483,7 @@ palette = ["#DD8452" if "ESM2" in m else "#4C72B0" for m in comp_plot["model"]]
 for ax, metric in zip(axes, ["auroc", "auprc"]):
     bars = ax.bar(comp_plot["label"], comp_plot[metric], color=palette)
     ax.set_ylabel(metric.upper(), fontsize=12)
-    ax.set_title(f"All Models — Test {metric.upper()}", fontsize=12)
+    ax.set_title(f"All Models - Test {metric.upper()}", fontsize=12)
     ax.set_ylim(0, 1.05)
     ax.axhline(0.5, color="gray", linestyle="--", linewidth=0.8, alpha=0.6)
     for bar, val in zip(bars, comp_plot[metric]):
@@ -494,7 +494,7 @@ from matplotlib.patches import Patch
 ax.legend(handles=[Patch(color="#DD8452", label="ESM-2 models"),
                    Patch(color="#4C72B0", label="Phase 3 baseline")],
           loc="lower right")
-plt.suptitle("Phase 3 vs Phase 4 — Test Set Comparison", fontsize=13)
+plt.suptitle("Phase 3 vs Phase 4 - Test Set Comparison", fontsize=13)
 plt.tight_layout()
 plt.savefig(OUTPUT_DIR / "phase4_comparison.png", dpi=150)
 plt.close()

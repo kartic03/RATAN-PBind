@@ -123,7 +123,7 @@ et.fit(X_train, y_train)
 results.append(evaluate("ExtraTrees", et, X_val, y_val))
 joblib.dump(et, MODEL_DIR / "et.pkl")
 
-# ── 4. XGBoost — Optuna + GPU ─────────────────────────────────────────────────
+# ── 4. XGBoost - Optuna + GPU ─────────────────────────────────────────────────
 
 log("\n[4/7] XGBoost (Optuna 80 trials, GPU)...")
 skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_SEED)
@@ -180,7 +180,7 @@ xgb_smote = xgb.XGBClassifier(**{**best_xgb_params, "scale_pos_weight": 1.0})
 xgb_smote.fit(X_sm, y_sm)
 results.append(evaluate("XGBoost_SMOTE", xgb_smote, X_val, y_val))
 
-# ── 5. LightGBM — Optuna + GPU ────────────────────────────────────────────────
+# ── 5. LightGBM - Optuna + GPU ────────────────────────────────────────────────
 
 log("\n[5/7] LightGBM (Optuna 80 trials, GPU)...")
 lgb_device = "gpu" if USE_GPU else "cpu"
@@ -250,7 +250,7 @@ log(f"  {'-'*55}")
 for _, row in results_df.iterrows():
     log(f"  {row['model']:<25} {row['auroc']:>7.4f} {row['auprc']:>7.4f} {row['f1']:>7.4f} {row['mcc']:>7.4f}")
 
-# ── Test set — top 4 models ───────────────────────────────────────────────────
+# ── Test set - top 4 models ───────────────────────────────────────────────────
 
 model_map = {
     "XGBoost": xgb_model, "XGBoost_SMOTE": xgb_smote,
@@ -327,7 +327,7 @@ color_map = {
 bar_colors = [color_map.get(g, "#aaaaaa") for g in top30["group"]]
 ax.barh(top30["feature"][::-1], top30["mean_abs_shap"][::-1], color=bar_colors[::-1])
 ax.set_xlabel("Mean |SHAP value|")
-ax.set_title(f"Top 30 Features by SHAP — XGBoost")
+ax.set_title(f"Top 30 Features by SHAP - XGBoost")
 handles = [plt.Rectangle((0,0),1,1, color=v) for v in color_map.values()]
 ax.legend(handles, color_map.keys(), loc="lower right", fontsize=8)
 plt.tight_layout()
@@ -349,7 +349,7 @@ for ax, metric in zip(axes, ["auroc", "auprc"]):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.01,
                 f"{val:.3f}", ha="center", va="bottom", fontsize=8)
     ax.tick_params(axis="x", labelsize=8)
-plt.suptitle("Classical ML Baseline Comparison — Validation Set", fontsize=13)
+plt.suptitle("Classical ML Baseline Comparison - Validation Set", fontsize=13)
 plt.tight_layout()
 plt.savefig(OUTPUT_DIR / "model_comparison.png", dpi=150)
 plt.close()
@@ -360,7 +360,7 @@ if len(per_target_df) > 1:
     hdata = per_target_df.set_index("target")[["auroc", "auprc"]].sort_values("auroc")
     sns.heatmap(hdata, annot=True, fmt=".3f", cmap="RdYlGn",
                 vmin=0, vmax=1, ax=ax, linewidths=0.5)
-    ax.set_title(f"Per-Target Performance — {best_name} (Val)")
+    ax.set_title(f"Per-Target Performance - {best_name} (Val)")
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / "per_target_heatmap.png", dpi=150)
     plt.close()

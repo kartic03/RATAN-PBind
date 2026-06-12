@@ -253,8 +253,8 @@ modelA = train_loop(modelA, train_m, val_m, X_comb,
 torch.save(modelA.state_dict(), MODELS_DIR / "adv_mlp.pt")
 val_A  = evaluate(modelA, X_comb, val_m)
 test_A = evaluate(modelA, X_comb, test_m)
-print(f"  Val  — AUROC={val_A[0]:.4f}  AUPRC={val_A[1]:.4f}  F1={val_A[2]:.4f}  MCC={val_A[3]:.4f}")
-print(f"  Test — AUROC={test_A[0]:.4f}  AUPRC={test_A[1]:.4f}  F1={test_A[2]:.4f}  MCC={test_A[3]:.4f}")
+print(f"  Val  - AUROC={val_A[0]:.4f}  AUPRC={val_A[1]:.4f}  F1={val_A[2]:.4f}  MCC={val_A[3]:.4f}")
+print(f"  Test - AUROC={test_A[0]:.4f}  AUPRC={test_A[1]:.4f}  F1={test_A[2]:.4f}  MCC={test_A[3]:.4f}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MODEL B: Multi-Task MLP (binding + binding_strength + expression)
@@ -282,12 +282,12 @@ modelB = train_loop(modelB, train_m, val_m, X_comb,
 torch.save(modelB.state_dict(), MODELS_DIR / "multitask_mlp.pt")
 val_B  = evaluate(modelB, X_comb, val_m,  task="multitask")
 test_B = evaluate(modelB, X_comb, test_m, task="multitask")
-print(f"  Val  — AUROC={val_B[0]:.4f}  AUPRC={val_B[1]:.4f}  F1={val_B[2]:.4f}  MCC={val_B[3]:.4f}")
-print(f"  Test — AUROC={test_B[0]:.4f}  AUPRC={test_B[1]:.4f}  F1={test_B[2]:.4f}  MCC={test_B[3]:.4f}")
+print(f"  Val  - AUROC={val_B[0]:.4f}  AUPRC={val_B[1]:.4f}  F1={val_B[2]:.4f}  MCC={val_B[3]:.4f}")
+print(f"  Test - AUROC={test_B[0]:.4f}  AUPRC={test_B[1]:.4f}  F1={test_B[2]:.4f}  MCC={test_B[3]:.4f}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MODEL C: Target-Aware MLP (learnable target embeddings)
-#          Best Phase 5 model — target identity is crucial information
+#          Best Phase 5 model - target identity is crucial information
 # ══════════════════════════════════════════════════════════════════════════════
 print("\n" + "="*70)
 print("[Model C] Target-Aware MLP (learnable 32-dim target embeddings)")
@@ -313,8 +313,8 @@ modelC = train_loop(modelC, train_m, val_m, X_comb,
 torch.save(modelC.state_dict(), MODELS_DIR / "target_aware_mlp.pt")
 val_C  = evaluate(modelC, X_comb, val_m,  task="target_aware")
 test_C = evaluate(modelC, X_comb, test_m, task="target_aware")
-print(f"  Val  — AUROC={val_C[0]:.4f}  AUPRC={val_C[1]:.4f}  F1={val_C[2]:.4f}  MCC={val_C[3]:.4f}")
-print(f"  Test — AUROC={test_C[0]:.4f}  AUPRC={test_C[1]:.4f}  F1={test_C[2]:.4f}  MCC={test_C[3]:.4f}")
+print(f"  Val  - AUROC={val_C[0]:.4f}  AUPRC={val_C[1]:.4f}  F1={val_C[2]:.4f}  MCC={val_C[3]:.4f}")
+print(f"  Test - AUROC={test_C[0]:.4f}  AUPRC={test_C[1]:.4f}  F1={test_C[2]:.4f}  MCC={test_C[3]:.4f}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MODEL D: Fine-Tuned ESM-2 (last 4 transformer layers + classification head)
@@ -375,7 +375,7 @@ pairs_test  = pairs[test_m].reset_index(drop=True)
 tok_train = manual_tokenize(pairs_train["sequence"].tolist())
 tok_val   = manual_tokenize(pairs_val["sequence"].tolist())
 tok_test  = manual_tokenize(pairs_test["sequence"].tolist())
-print(f"  Token shapes — train:{tuple(tok_train.shape)}  val:{tuple(tok_val.shape)}")
+print(f"  Token shapes - train:{tuple(tok_train.shape)}  val:{tuple(tok_val.shape)}")
 
 y_tr = torch.tensor(pairs_train["binding_label"].values, dtype=torch.float32)
 y_v  = torch.tensor(pairs_val["binding_label"].values,   dtype=torch.float32)
@@ -493,8 +493,8 @@ def eval_esm(model, ds):
 
 val_D  = eval_esm(modelD, val_ds_D)
 test_D = eval_esm(modelD, test_ds_D)
-print(f"  Val  — AUROC={val_D[0]:.4f}  AUPRC={val_D[1]:.4f}  F1={val_D[2]:.4f}  MCC={val_D[3]:.4f}")
-print(f"  Test — AUROC={test_D[0]:.4f}  AUPRC={test_D[1]:.4f}  F1={test_D[2]:.4f}  MCC={test_D[3]:.4f}")
+print(f"  Val  - AUROC={val_D[0]:.4f}  AUPRC={val_D[1]:.4f}  F1={val_D[2]:.4f}  MCC={val_D[3]:.4f}")
+print(f"  Test - AUROC={test_D[0]:.4f}  AUPRC={test_D[1]:.4f}  F1={test_D[2]:.4f}  MCC={test_D[3]:.4f}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MODEL E: Fine-Tuned ESM-2 embeddings + Handcrafted features
@@ -537,8 +537,8 @@ modelE = train_loop(modelE, train_m, val_m, XE_all,
 torch.save(modelE.state_dict(), MODELS_DIR / "esm2_ft_combined.pt")
 val_E  = evaluate(modelE, XE_all, val_m)
 test_E = evaluate(modelE, XE_all, test_m)
-print(f"  Val  — AUROC={val_E[0]:.4f}  AUPRC={val_E[1]:.4f}  F1={val_E[2]:.4f}  MCC={val_E[3]:.4f}")
-print(f"  Test — AUROC={test_E[0]:.4f}  AUPRC={test_E[1]:.4f}  F1={test_E[2]:.4f}  MCC={test_E[3]:.4f}")
+print(f"  Val  - AUROC={val_E[0]:.4f}  AUPRC={val_E[1]:.4f}  F1={val_E[2]:.4f}  MCC={val_E[3]:.4f}")
+print(f"  Test - AUROC={test_E[0]:.4f}  AUPRC={test_E[1]:.4f}  F1={test_E[2]:.4f}  MCC={test_E[3]:.4f}")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Summary
@@ -560,7 +560,7 @@ results_test = {
 
 for split_name, results in [("VALIDATION", results_val), ("TEST", results_test)]:
     print(f"\n{'='*70}")
-    print(f"PHASE 5 — {split_name} RESULTS")
+    print(f"PHASE 5 - {split_name} RESULTS")
     print(f"  {'Model':<35}  {'AUROC':>7}  {'AUPRC':>7}  {'F1':>7}  {'MCC':>7}")
     print("  " + "-"*63)
     for name, (au, ap, f1, mcc) in sorted(results.items(), key=lambda x: -x[1][1]):

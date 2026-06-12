@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 Batch 4 — robustness checks:
+"""R8 Batch 4 - robustness checks:
 1 k-NN baseline (is proto just nearest-neighbour?)  2 expression confound
 3 affinity/strength ranking  4 grouped leakage (leave-author/method-out)
 5 fair structural benchmark  6 feature-count reconciliation. CPU."""
@@ -63,7 +63,7 @@ if bm.sum()>20:
         ys=np.concatenate([np.ones(strong.sum()),np.zeros(weak.sum())]); ps=np.concatenate([m.predict_proba(Xfull[strong])[:,1],m.predict_proba(Xfull[weak])[:,1]])
         print(f"  Strong-vs-Weak discrimination AUROC={roc_auc_score(ys,ps):.3f} (n_strong={strong.sum()},n_weak={weak.sum()})")
 
-print("\n=== 4. GROUPED LEAKAGE — leave-author-out & leave-design-method-out (5-fold GroupKFold) ===")
+print("\n=== 4. GROUPED LEAKAGE - leave-author-out & leave-design-method-out (5-fold GroupKFold) ===")
 for gcol in ["author","design_method"]:
     g=fm[gcol].fillna("NA").astype(str).values
     aucs=[]; gkf=GroupKFold(5)
@@ -86,7 +86,7 @@ def cvauc(X1):
     return np.mean(c)
 for met in ["af3_ipSAE_avg","boltz1_iptm_avg","colab_iptm_avg"]:
     if met in ov.columns: print(f"  {met:20s} (CV logistic) AUROC={cvauc(pd.to_numeric(ov[met],errors='coerce').values):.3f}")
-print("  (compare to sequence-ML 5-fold CV 0.730 from R8.3 — now both are CV-trained, fair)")
+print("  (compare to sequence-ML 5-fold CV 0.730 from R8.3 - now both are CV-trained, fair)")
 
 print("\n=== 6. FEATURE COUNT reconciliation ===")
 print(f"  headline reproduction model = base({len(base_cols)}) + proto(7) = {len(base_cols)+7} features (NOT 509)")

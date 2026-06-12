@@ -1,5 +1,5 @@
-# RATAN-PBind — reproducible environments (pixi)
-#   pixi run -e ml  <cmd>   data/ML/stats (CPU) — all analysis scripts
+# RATAN-PBind - reproducible environments (pixi)
+#   pixi run -e ml  <cmd>   data/ML/stats (CPU) - all analysis scripts
 #   pixi run -e gpu <cmd>   ESM-2 embeddings + Boltz-2 folding (GPU)
 # `pixi run` builds the full env per invocation, so backgrounded/detached jobs
 # get correct CUDA libs (fixes the conda+setsid segfault). ml/gpu are independent

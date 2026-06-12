@@ -1,5 +1,5 @@
 """
-RATAN-PBind — Retrieval-Augmented, Target-Aware Nomination for Protein Binding
+RATAN-PBind - Retrieval-Augmented, Target-Aware Nomination for Protein Binding
 Gradio Web Application
 
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
@@ -120,7 +120,7 @@ def shap_bar_chart(top_features: list, target: str):
     ax.set_yticks(y_pos)
     ax.set_yticklabels(short[::-1], fontsize=8.5, color=PALETTE["text"])
     ax.axvline(0, color=PALETTE["subtext"], lw=0.9)
-    ax.set_xlabel("SHAP value — contribution to binding probability",
+    ax.set_xlabel("SHAP value - contribution to binding probability",
                   fontsize=9, color=PALETTE["subtext"])
     ax.set_title(f"Feature contributions  ·  target: {target}",
                  fontsize=10, color=PALETTE["text"], fontweight="semibold", pad=10)
@@ -148,7 +148,7 @@ def probability_gauge(prob: float, target: str, threshold: float):
     ax.set_xticklabels(["0 %", "25 %", "50 %", "75 %", "100 %"],
                        fontsize=9, color=PALETTE["subtext"])
     verdict = "Predicted binder" if prob >= threshold else "Predicted non-binder"
-    ax.set_title(f"{verdict}  —  {prob:.1%} binding probability  ·  {target}",
+    ax.set_title(f"{verdict}  -  {prob:.1%} binding probability  ·  {target}",
                  fontsize=10, color=PALETTE["text"], fontweight="semibold", pad=9)
     ax.legend(fontsize=8, framealpha=0.0, labelcolor=PALETTE["subtext"], loc="lower right")
     _apply_base_style(ax, fig)
@@ -300,7 +300,7 @@ def batch_analyze(file, target: str, seq_col: str):
         else:
             top3 = results.head(3)
             top_lines = "\n".join(
-                f"  {i+1}. {row['sequence']}  —  {row['probability']:.1%}  ({row['confidence']})"
+                f"  {i+1}. {row['sequence']}  -  {row['probability']:.1%}  ({row['confidence']})"
                 for i, (_, row) in enumerate(top3.iterrows())
             )
             note = ("\nNo predicted binders found." if n_binders == 0
@@ -330,7 +330,7 @@ def mutation_advisor(sequence: str, target: str, top_n: int):
                     f"A single-point mutation scan of a {len(sequence)}-residue binder against "
                     f"{target} found no beneficial substitutions. Baseline binding probability: "
                     f"{baseline['probability']:.2%}. Proto_ratio: {baseline['proto_ratio']:.3f}. "
-                    f"In 2–3 sentences, explain what this means and give 2 specific next steps "
+                    f"In 2-3 sentences, explain what this means and give 2 specific next steps "
                     f"for improving binding (e.g. multi-point mutations, redesign strategy, "
                     f"different scaffold). Be specific, not generic."
                 )
@@ -359,7 +359,7 @@ def mutation_advisor(sequence: str, target: str, top_n: int):
         else:
             advice = f"**Top {len(muts)} mutations for {target}:**\n\n"
             for m in muts:
-                advice += (f"- **{m['mutation']}** — "
+                advice += (f"- **{m['mutation']}** - "
                            f"{m['original_prob']:.1%} → {m['mutant_prob']:.1%} "
                            f"(+{m['delta']:.1%})\n")
             advice += "\nExperimental validation is required to confirm predictions."
@@ -555,7 +555,7 @@ RATAN-PBind is a sequence-based binder pre-screen using LightGBM with ESM-2
 target-conditioned prototype-similarity features (651M parameter language model).
 Trained on Proteinbase (Adaptyv Bio, ODC-BY). Supports 24 human and viral targets.
 Key features: proto_ratio (cosine similarity to known binders vs non-binders in ESM-2
-embedding space — the strongest single predictor), esmfold_pLDDT (predicted structural
+embedding space - the strongest single predictor), esmfold_pLDDT (predicted structural
 quality), method_success_rate (historical success rate of design method used)."""
 
 def chat_respond(message: str, history: list):
@@ -589,7 +589,7 @@ def chat_respond(message: str, history: list):
     elif any(w in msg for w in ["auroc", "accuracy", "performance", "score"]):
         response = ("RATAN-PBind reaches AUROC 0.946 on held-out test data (nested-CV 0.895) within "
                     "its target distribution. Performance degrades with distance from training: ~0.77 "
-                    "on a new design campaign and ~0.55 zero-shot to a novel target — adding ~2 known "
+                    "on a new design campaign and ~0.55 zero-shot to a novel target - adding ~2 known "
                     "binders (few-shot) recovers a new target to ~0.70. Top-10% ranking gives 4.8x "
                     "enrichment over the 17.8% base rate. Stable at 0.940 ± 0.005 across 5 seeds.")
     elif any(w in msg for w in ["proto", "prototype", "proto_ratio"]):
@@ -608,10 +608,10 @@ def chat_respond(message: str, history: list):
                     f"({rate:.1%} success rate in training data).")
     elif any(w in msg for w in ["fail", "low", "poor", "wrong", "bad"]):
         response = ("Common reasons for a low binding prediction:\n"
-                    "1. Low proto_ratio — sequence does not resemble known binders in ESM-2 space\n"
-                    "2. Low esmfold_pLDDT — disordered or poorly folded structure predicted\n"
-                    "3. High instability index — protein may not be stable in solution\n"
-                    "4. Low-success design method — consider bindcraft, protrl, or mosaic\n\n"
+                    "1. Low proto_ratio - sequence does not resemble known binders in ESM-2 space\n"
+                    "2. Low esmfold_pLDDT - disordered or poorly folded structure predicted\n"
+                    "3. High instability index - protein may not be stable in solution\n"
+                    "4. Low-success design method - consider bindcraft, protrl, or mosaic\n\n"
                     "Use the Mutation Advisor tab to identify beneficial single substitutions.")
     elif any(w in msg for w in ["improve", "better", "mutat", "design", "increase"]):
         response = ("To improve binding probability:\n"
@@ -621,11 +621,11 @@ def chat_respond(message: str, history: list):
                     "4. Use a design method with a higher success rate (protrl 39%, mosaic 81%)")
     elif any(w in msg for w in ["shap", "feature", "important", "contribut"]):
         response = ("Top 5 features by SHAP importance:\n"
-                    "1. proto_ratio — binder/non-binder similarity ratio\n"
-                    "2. method_success_rate — historical success of the design method\n"
-                    "3. proto_disc_proj — discriminative projection onto binder space\n"
-                    "4. proto_l2_pos — L2 distance to the binder prototype\n"
-                    "5. esmfold_pLDDT — structural quality score\n\n"
+                    "1. proto_ratio - binder/non-binder similarity ratio\n"
+                    "2. method_success_rate - historical success of the design method\n"
+                    "3. proto_disc_proj - discriminative projection onto binder space\n"
+                    "4. proto_l2_pos - L2 distance to the binder prototype\n"
+                    "5. esmfold_pLDDT - structural quality score\n\n"
                     "Prototype features occupy 5 of the top 9 positions.")
     elif any(w in msg for w in ["cite", "citation", "paper", "reference", "journal"]):
         response = ("Paper in preparation:\n"
@@ -656,7 +656,7 @@ def chat_respond(message: str, history: list):
 # ── CSS ───────────────────────────────────────────────────────────────────────
 CSS = """
 /* ═══════════════════════════════════════════════════════════
-   RATAN-PBind — Force light theme in all browsers/OS modes
+   RATAN-PBind - Force light theme in all browsers/OS modes
    ═══════════════════════════════════════════════════════════ */
 
 /* 1. Lock color scheme so browser dark-mode never applies */
@@ -714,7 +714,7 @@ body,
     margin: 0;
 }
 
-/* Tabs — force light colors regardless of browser theme */
+/* Tabs - force light colors regardless of browser theme */
 .tab-nav, .tab-nav > * {
     background: #FFFFFF !important;
     border-bottom: 1px solid #E2E8F0 !important;
@@ -740,7 +740,7 @@ body,
     font-weight: 600 !important;
 }
 
-/* Inputs — force light background/text everywhere */
+/* Inputs - force light background/text everywhere */
 label, label span, label > span {
     font-size: 12px !important;
     font-weight: 600 !important;
@@ -779,19 +779,19 @@ ul.options li:hover, ul.options li.selected {
     color: #1D4ED8 !important;
 }
 
-/* Block cards — white so they float on top of the gradient */
+/* Block cards - white so they float on top of the gradient */
 .block, .form, .panel {
     background: #FFFFFF !important;
     border: 1px solid #E2E8F0 !important;
     border-radius: 10px !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
 }
-/* Tab content area — transparent so gradient bleeds through */
+/* Tab content area - transparent so gradient bleeds through */
 .tabitem, .tabitem > .gap, .gap {
     background: transparent !important;
 }
 
-/* All plain text — inherit from container so it's always dark */
+/* All plain text - inherit from container so it's always dark */
 p, span, div, h1, h2, h3, h4, li, td, th {
     color: inherit;
 }
@@ -954,7 +954,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
         with gr.Tab("Prediction"):
             with gr.Row(equal_height=False):
 
-                # Left panel — inputs
+                # Left panel - inputs
                 with gr.Column(scale=2, min_width=300):
                     gr.HTML('<p class="section-label">Input</p>')
                     demo_selector = gr.Dropdown(
@@ -975,7 +975,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
                         placeholder="bindcraft, boltzgen, rfdiffusion …")
                     predict_btn = gr.Button("Run prediction", variant="primary", size="lg")
 
-                # Right panel — results
+                # Right panel - results
                 with gr.Column(scale=3, min_width=400):
                     gr.HTML('<p class="section-label">Result</p>')
                     gauge_out   = gr.Plot(label="", show_label=False)
@@ -1154,14 +1154,14 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
 
 A machine-learning pre-screen for de novo binder campaigns across 24 human and viral targets,
 trained on experimental data from the Proteinbase dataset. It ranks candidates cheaply from
-sequence and reports a quantified applicability domain — where the predictions can and cannot
-be trusted — with a few-shot path to new targets.
+sequence and reports a quantified applicability domain - where the predictions can and cannot
+be trusted - with a few-shot path to new targets.
 
 **Model**
 LightGBM on 470 features: ESM-2 target-conditioned prototype-similarity features, sequence
 composition, physicochemical properties, design-method priors, and Boltz2 structural metrics.
-The prototype-similarity features — how closely a candidate resembles known binders of each
-target in ESM-2 embedding space — are the most informative predictors.
+The prototype-similarity features - how closely a candidate resembles known binders of each
+target in ESM-2 embedding space - are the most informative predictors.
 
 **Performance and applicability domain**
 Held-out AUROC 0.946 (nested-CV 0.895) in-distribution; ~0.77 on a new design campaign; ~0.55

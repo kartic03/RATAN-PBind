@@ -251,8 +251,8 @@ lgb_val_p  = lgb_aug.predict_proba(X_val)[:, 1]
 lgb_test_p = lgb_aug.predict_proba(X_test)[:, 1]
 m_lgb_v    = metrics(y_val,  lgb_val_p)
 m_lgb_t    = metrics(y_test, lgb_test_p)
-print(f"  LightGBM+IfaceHC Val  — AUROC={m_lgb_v[0]:.4f}  AUPRC={m_lgb_v[1]:.4f}  F1={m_lgb_v[2]:.4f}  MCC={m_lgb_v[3]:.4f}")
-print(f"  LightGBM+IfaceHC Test — AUROC={m_lgb_t[0]:.4f}  AUPRC={m_lgb_t[1]:.4f}  F1={m_lgb_t[2]:.4f}  MCC={m_lgb_t[3]:.4f}")
+print(f"  LightGBM+IfaceHC Val  - AUROC={m_lgb_v[0]:.4f}  AUPRC={m_lgb_v[1]:.4f}  F1={m_lgb_v[2]:.4f}  MCC={m_lgb_v[3]:.4f}")
+print(f"  LightGBM+IfaceHC Test - AUROC={m_lgb_t[0]:.4f}  AUPRC={m_lgb_t[1]:.4f}  F1={m_lgb_t[2]:.4f}  MCC={m_lgb_t[3]:.4f}")
 joblib.dump(lgb_aug, MODELS_DIR / "lgb_interface_hc.pkl")
 
 # ── Retrain XGBoost ───────────────────────────────────────────────────────────
@@ -271,8 +271,8 @@ xgb_val_p  = xgb_aug.predict_proba(X_val)[:, 1]
 xgb_test_p = xgb_aug.predict_proba(X_test)[:, 1]
 m_xgb_v    = metrics(y_val,  xgb_val_p)
 m_xgb_t    = metrics(y_test, xgb_test_p)
-print(f"  XGBoost+IfaceHC Val  — AUROC={m_xgb_v[0]:.4f}  AUPRC={m_xgb_v[1]:.4f}  F1={m_xgb_v[2]:.4f}  MCC={m_xgb_v[3]:.4f}")
-print(f"  XGBoost+IfaceHC Test — AUROC={m_xgb_t[0]:.4f}  AUPRC={m_xgb_t[1]:.4f}  F1={m_xgb_t[2]:.4f}  MCC={m_xgb_t[3]:.4f}")
+print(f"  XGBoost+IfaceHC Val  - AUROC={m_xgb_v[0]:.4f}  AUPRC={m_xgb_v[1]:.4f}  F1={m_xgb_v[2]:.4f}  MCC={m_xgb_v[3]:.4f}")
+print(f"  XGBoost+IfaceHC Test - AUROC={m_xgb_t[0]:.4f}  AUPRC={m_xgb_t[1]:.4f}  F1={m_xgb_t[2]:.4f}  MCC={m_xgb_t[3]:.4f}")
 joblib.dump(xgb_aug, MODELS_DIR / "xgb_interface_hc.pkl")
 
 # ── Load Phase 5 TargetAwareMLP ───────────────────────────────────────────────
@@ -401,8 +401,8 @@ mlp_val_p  = mlp_probs(modelC_aug, X_comb, val_m)
 mlp_test_p = mlp_probs(modelC_aug, X_comb, test_m)
 m_mlp_v    = metrics(y_bind[val_m],  mlp_val_p)
 m_mlp_t    = metrics(y_bind[test_m], mlp_test_p)
-print(f"  MLP+Aug Val  — AUROC={m_mlp_v[0]:.4f}  AUPRC={m_mlp_v[1]:.4f}  F1={m_mlp_v[2]:.4f}  MCC={m_mlp_v[3]:.4f}")
-print(f"  MLP+Aug Test — AUROC={m_mlp_t[0]:.4f}  AUPRC={m_mlp_t[1]:.4f}  F1={m_mlp_t[2]:.4f}  MCC={m_mlp_t[3]:.4f}")
+print(f"  MLP+Aug Val  - AUROC={m_mlp_v[0]:.4f}  AUPRC={m_mlp_v[1]:.4f}  F1={m_mlp_v[2]:.4f}  MCC={m_mlp_v[3]:.4f}")
+print(f"  MLP+Aug Test - AUROC={m_mlp_t[0]:.4f}  AUPRC={m_mlp_t[1]:.4f}  F1={m_mlp_t[2]:.4f}  MCC={m_mlp_t[3]:.4f}")
 
 # ── Weighted ensemble ─────────────────────────────────────────────────────────
 print("\n" + "="*70)
@@ -427,14 +427,14 @@ for w0 in np.arange(0.2, 0.7, 0.1):
 res   = minimize(neg_ap, best_w0, method='Nelder-Mead',
                  options={'xatol': 1e-5, 'fatol': 1e-5, 'maxiter': 1000})
 w_opt = np.abs(res.x) / np.abs(res.x).sum()
-print(f"  Weights — LGB: {w_opt[0]:.3f}  XGB: {w_opt[1]:.3f}  MLP: {w_opt[2]:.3f}")
+print(f"  Weights - LGB: {w_opt[0]:.3f}  XGB: {w_opt[1]:.3f}  MLP: {w_opt[2]:.3f}")
 
 ens_val_p  = (val_stack  * w_opt).sum(1)
 ens_test_p = (test_stack * w_opt).sum(1)
 m_ens_v    = metrics(y_v, ens_val_p)
 m_ens_t    = metrics(y_t, ens_test_p)
-print(f"  Ensemble Val  — AUROC={m_ens_v[0]:.4f}  AUPRC={m_ens_v[1]:.4f}  F1={m_ens_v[2]:.4f}  MCC={m_ens_v[3]:.4f}")
-print(f"  Ensemble Test — AUROC={m_ens_t[0]:.4f}  AUPRC={m_ens_t[1]:.4f}  F1={m_ens_t[2]:.4f}  MCC={m_ens_t[3]:.4f}")
+print(f"  Ensemble Val  - AUROC={m_ens_v[0]:.4f}  AUPRC={m_ens_v[1]:.4f}  F1={m_ens_v[2]:.4f}  MCC={m_ens_v[3]:.4f}")
+print(f"  Ensemble Test - AUROC={m_ens_t[0]:.4f}  AUPRC={m_ens_t[1]:.4f}  F1={m_ens_t[2]:.4f}  MCC={m_ens_t[3]:.4f}")
 
 # Platt calibration
 cal = LogisticRegression(C=1.0, solver='lbfgs', max_iter=500, random_state=RANDOM_SEED)
@@ -443,8 +443,8 @@ cal_val_p  = cal.predict_proba(ens_val_p.reshape(-1, 1))[:, 1]
 cal_test_p = cal.predict_proba(ens_test_p.reshape(-1, 1))[:, 1]
 m_cal_v    = metrics(y_v, cal_val_p)
 m_cal_t    = metrics(y_t, cal_test_p)
-print(f"  Calibrated Val  — AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
-print(f"  Calibrated Test — AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
+print(f"  Calibrated Val  - AUROC={m_cal_v[0]:.4f}  AUPRC={m_cal_v[1]:.4f}  F1={m_cal_v[2]:.4f}  MCC={m_cal_v[3]:.4f}")
+print(f"  Calibrated Test - AUROC={m_cal_t[0]:.4f}  AUPRC={m_cal_t[1]:.4f}  F1={m_cal_t[2]:.4f}  MCC={m_cal_t[3]:.4f}")
 
 # Per-target thresholds
 val_tgts  = pairs_aug["target"].values[val_m]
@@ -474,7 +474,7 @@ mcc_pt   = matthews_corrcoef(y_t, y_pred_pt)
 
 # ── Final summary ─────────────────────────────────────────────────────────────
 print("\n" + "="*70)
-print("PHASE 6a — FINAL SUMMARY (TEST SET)")
+print("PHASE 6a - FINAL SUMMARY (TEST SET)")
 print(f"  {'Model':<50}  {'AUROC':>7}  {'AUPRC':>7}  {'F1':>7}  {'MCC':>7}")
 print("  " + "-"*82)
 print(f"  {'--- Previous Best ---':<50}")
