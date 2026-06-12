@@ -1,37 +1,32 @@
 # RATAN-PBind
 
-**Residue Attribution and Target Affinity Network for Protein Binding**
+**Sequence-based prioritisation of de novo protein binders, with a characterised applicability domain and few-shot extension to new targets.**
 
-A multi-target protein binding predictor trained on 2,643 experimentally validated protein–target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence).
+A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein–target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders cheaply from sequence and reports *where its predictions can and cannot be trusted*.
 
-![Graphical Abstract](RATAN_PBind_graphical_abstract.png)
+![Graphical Abstract](graphical_abstract.png)
 
----
+## What it does
 
-## Key Results
+De novo binder design produces thousands of candidates per campaign, but fewer than one in five binds. RATAN-PBind ranks candidates from sequence using a target-conditioned **prototype-similarity** feature (how closely a candidate resembles a target's known binders vs non-binders in ESM-2 embedding space) on top of composition, physicochemical, design-method, and structural features.
 
-| Model | AUROC | AUPRC | F1 | MCC |
-|-------|-------|-------|----|-----|
-| LightGBM + Proto (final) | **0.940** | **0.765** | 0.748 | 0.698 |
-| LightGBM baseline | 0.893 | 0.713 | 0.678 | 0.625 |
+The contribution is an honest, quantified **applicability domain** rather than a single headline number: we show across four generalisation axes exactly where the model works.
 
-- **509 features**: amino acid composition, dipeptide composition, physicochemical properties, ESMFold/ProteinMPNN scores, Boltz2 structural metrics, design method encoding, and 7 novel prototype similarity features
-- **proto_ratio** is the top SHAP feature — 2.2× more important than the next feature
-- Multi-seed stability: AUROC = 0.9395 ± 0.0054 (10 random seeds)
-- Well-calibrated: ECE = 0.042
+## Key results
 
----
+| Evaluation | AUROC |
+|---|---|
+| In-distribution, held-out test | **0.946** (95% CI 0.919–0.968) |
+| In-distribution, nested cross-validation (leakage-free) | **0.895 ± 0.006** |
+| Across design methods (leave-method/author-out) | 0.73–0.82 |
+| Zero-shot to a novel target (LOTO) | 0.54–0.57 |
+| Independent dataset (after de-duplication) | ~0.49 |
 
-## Features
-
-- **Binding prediction** — probability score + confidence for 24 human/viral targets
-- **SHAP interpretability** — residue-level feature attribution
-- **LLM integration** — Groq/Llama-3.3-70b translates SHAP into mechanistic molecular explanations
-- **Mutation advisor** — point mutation scanning with biochemical rationale
-- **Generative design** — directed evolution + ESM-2 MLM redesign engine
-- **Interactive web app** — 6-tab Gradio interface
-
----
+- **470 features** (463 base + 7 prototype-similarity). `proto_ratio` is the top SHAP feature.
+- **Practical utility:** top-10% ranking enriches binders **4.8×** over the 17.8% base rate.
+- **Few-shot:** adding ~2 known binders of a new target recovers AUROC from chance to **~0.70**.
+- **Validated:** label-shuffle control, sequence- and batch-level leakage audits, nearest-neighbour and single-feature baselines, external (Overath 2025) and natural-PPI (SKEMPI 2.0) checks, and independent structural validation (Boltz-2 ipTM, MM-GBSA).
+- The model is a **binder/non-binder classifier** and does not rank affinity.
 
 ## Installation
 
@@ -41,111 +36,67 @@ cd RATAN-PBind
 pip install -r requirements.txt
 ```
 
-### Optional: Groq AI integration
-Create a `.env` file:
-```
-GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL=llama-3.3-70b-versatile
-```
-Get a free API key at [console.groq.com](https://console.groq.com).
+For a fully reproducible environment, use the pixi lockfile (`pixi.toml` / `pixi.lock`):
 
----
+```bash
+pixi run -e ml python src/r3_robust_eval.py   # CPU analysis
+pixi run -e gpu python src/r1_embed_targets.py # ESM-2 embeddings (CUDA)
+```
+
+### Optional: Groq LLM interpretation
+Create a `.env` file with `GROQ_API_KEY=...` (free key at [console.groq.com](https://console.groq.com)). The LLM module is a faithfulness-bounded convenience (~87% grounded in the SHAP evidence), not a mechanistic claim.
 
 ## Usage
 
 ### Web app
 ```bash
-python3 app.py
-# Open http://localhost:7860
+python3 app.py    # open http://localhost:7860
 ```
 
 ### Python API
 ```python
 from protbind import ProtBind
-
 pb = ProtBind()
-
-# Single prediction
 result = pb.predict("MASWKELLVQNKNQFNLERSELTNGFLKPIVKVVKKLPEEVLAERIRKAFG",
                     target="nipah-glycoprotein-g")
 print(f"Binding probability: {result['probability']:.1%}")
-
-# SHAP explanation
 explanation = pb.explain(result, top_n=10)
-
-# Mutation scan
-mutations = pb.suggest_mutations(sequence, target="egfr", top_n=10)
-
-# Batch prediction
-df = pb.batch_predict(sequences_list, target="egfr")
+mutations   = pb.suggest_mutations(sequence, target="egfr", top_n=10)
 ```
 
-### Generative design
-```python
-from protbind.designer import ProtBindDesigner
+Targets with few known binders fall in the few-shot regime — interpret scores accordingly and calibrate on a first experimental batch.
 
-designer = ProtBindDesigner(pb)
-result = designer.design(
-    target="nipah-glycoprotein-g",
-    seed_sequence="MASWKELLVQ...",
-    mode="combined"   # evolution + ESM-2 MLM refinement
-)
-```
+## Reproducing the analysis
 
----
+All experiments are scripted under `src/` and regenerate from the released artefacts:
 
-## Supported Targets (24)
+- `src/r1_*` target-aware modelling / leave-one-target-out
+- `src/r3_robust_eval.py` bootstrap CIs, per-target reliability, shared-vs-single
+- `src/r8_*`, `src/r8b_*` significance, leakage audits, few-shot, baselines, calibration, external/SKEMPI/MM-GBSA
+- `src/r7_figures_final.py` the manuscript figure set
+
+Frozen feature matrices, train/val/test splits, ESM-2 embeddings, models, and target sequences are in `features/`, `data/`, and `models/` (and archived on Zenodo; DOI to be added on acceptance). `paper/REVISION_FINDINGS.md` documents every result with its source file.
+
+## Supported targets (24)
 
 `egfr` · `nipah-glycoprotein-g` · `pd-l1` · `mdm2` · `il7r` · `spcas9` · `human-insulin-receptor` · `human-pdgfr-beta` · `human-mzb1-perp1` · `ifnar2` · `fgf-r1` · `fcrn` · `der21` · `der7` · `human-ambp` · `human-idi2` · `human-rfk` · `hnmt` · `human-pmvk` · `human-phyh` · `human-serum-albumin` · `human-tnfa` · `human-orm2` · `human-gm2a`
 
----
-
-## Repository Structure
-
-```
-RATAN-PBind/
-├── app.py                  # Gradio web application (6 tabs)
-├── protbind/               # Python package
-│   ├── __init__.py         # ProtBind class + KNOWN_TARGETS
-│   ├── predictor.py        # predict(), explain(), suggest_mutations()
-│   ├── features.py         # Feature extraction pipeline
-│   ├── ai_explain.py       # Groq LLM integration
-│   └── designer.py         # Generative design engine
-├── src/                    # Training scripts (phases 1–8)
-├── models/                 # Pre-trained model weights
-├── features/               # Pre-computed feature matrices
-├── data/                   # Train/val/test splits
-└── outputs/                # Result CSVs and plots
-```
-
----
-
 ## Data
 
-Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence).
-The raw dataset is not included in this repository. Download from:
-https://storage.proteinbase.com/proteinbase_all_data_28_01_2026.csv
+Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence). The raw dataset is not redistributed here; download from https://storage.proteinbase.com/proteinbase_all_data_28_01_2026.csv
 
-> *This work used Proteinbase by Adaptyv Bio under ODC-BY licence.*
-
----
+> *This work used Proteinbase by Adaptyv Bio under the ODC-BY licence.*
 
 ## Citation
 
-> Kartic. RATAN-PBind: Residue Attribution and Target Affinity Network for Protein Binding.
-> GitHub: https://github.com/kartic03/RATAN-PBind
+> Kartic, Choi J, Park T-S. RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised applicability domain and few-shot extension to new targets. *Journal of Cheminformatics* (under review).
+> Code: https://github.com/kartic03/RATAN-PBind
 
----
+## Authors
 
-## Author
-
-**Kartic**
-Department of Life Sciences, Gachon University
-Seongnam, Gyeonggido 13120, Republic of Korea
-
----
+Kartic and Jiwon Choi (equal contribution); Tae-Sik Park (corresponding).
+Department of Life Sciences, Gachon University, Seongnam, Republic of Korea.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE) for details.
-Training data: ODC-BY (Proteinbase, Adaptyv Bio).
+MIT — see [LICENSE](LICENSE). Training data: ODC-BY (Proteinbase, Adaptyv Bio).

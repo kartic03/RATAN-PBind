@@ -1,5 +1,5 @@
 """
-RATAN-PBind — Residue Attribution and Target Affinity Network for Protein Binding
+RATAN-PBind — sequence-based prioritisation of de novo protein binders
 Gradio Web Application
 
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
@@ -551,8 +551,8 @@ CHAT_SYSTEM = """You are RATAN-PBind AI, an expert scientific assistant speciali
 protein-protein binding prediction. Help users interpret results, understand
 protein biochemistry, and improve their designs. Be concise and precise.
 
-RATAN-PBind (Residue Attribution and Target Affinity Network for Protein Binding) uses
-LightGBM with ESM-2 prototype embeddings (651M parameter language model).
+RATAN-PBind is a sequence-based binder pre-screen using LightGBM with ESM-2
+target-conditioned prototype-similarity features (651M parameter language model).
 Trained on Proteinbase (Adaptyv Bio, ODC-BY). Supports 24 human and viral targets.
 Key features: proto_ratio (cosine similarity to known binders vs non-binders in ESM-2
 embedding space — the strongest single predictor), esmfold_pLDDT (predicted structural
@@ -587,9 +587,11 @@ def chat_respond(message: str, history: list):
                     "Ask me to interpret a prediction result, explain a feature, or suggest "
                     "how to improve your binder design.")
     elif any(w in msg for w in ["auroc", "accuracy", "performance", "score"]):
-        response = ("RATAN-PBind achieves AUROC 0.94 on matched-target evaluation and 0.66 on "
-                    "zero-shot cross-target generalization. The model is stable: 0.9395 ± 0.0054 "
-                    "across 5 random seeds. AUPRC = 0.76, approximately 4× above the random baseline.")
+        response = ("RATAN-PBind reaches AUROC 0.946 on held-out test data (nested-CV 0.895) within "
+                    "its target distribution. Performance degrades with distance from training: ~0.77 "
+                    "on a new design campaign and ~0.55 zero-shot to a novel target — adding ~2 known "
+                    "binders (few-shot) recovers a new target to ~0.70. Top-10% ranking gives 4.8x "
+                    "enrichment over the 17.8% base rate. Stable at 0.940 ± 0.005 across 5 seeds.")
     elif any(w in msg for w in ["proto", "prototype", "proto_ratio"]):
         response = ("proto_ratio is the most important feature in RATAN-PBind (SHAP rank 1). "
                     "It equals cosine similarity to training binders divided by cosine similarity "
@@ -626,8 +628,9 @@ def chat_respond(message: str, history: list):
                     "5. esmfold_pLDDT — structural quality score\n\n"
                     "Prototype features occupy 5 of the top 9 positions.")
     elif any(w in msg for w in ["cite", "citation", "paper", "reference", "journal"]):
-        response = ("Paper in preparation:\n"
-                    "RATAN-PBind: Residue Attribution and Target Affinity Network for Protein Binding\n\n"
+        response = ("Paper under review (Journal of Cheminformatics):\n"
+                    "RATAN-PBind: sequence-based prioritisation of de novo protein binders with a "
+                    "characterised applicability domain and few-shot extension to new targets\n\n"
                     "Dataset: Proteinbase by Adaptyv Bio (ODC-BY license).")
     elif any(w in msg for w in ["use", "install", "how", "start", "begin", "python"]):
         response = ("Python API:\n"
@@ -939,8 +942,8 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
     <div class="pb-header">
       <p class="pb-title">RATAN-PBind</p>
       <p class="pb-subtitle">
-        Residue Attribution and Target Affinity Network for Protein Binding &nbsp;·&nbsp;
-        ESM-2 embeddings &nbsp;·&nbsp; 24 targets &nbsp;·&nbsp; 2,517 proteins
+        Sequence-based de novo binder prioritisation &nbsp;·&nbsp;
+        ESM-2 + prototype similarity &nbsp;·&nbsp; 24 targets &nbsp;·&nbsp; 2,630 pairs
       </p>
     </div>
     """)
@@ -1147,34 +1150,41 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
             gr.Markdown(f"""
 ### RATAN-PBind
 
-**Residue Attribution and Target Affinity Network for Protein Binding**
+**Sequence-based prioritisation of de novo protein binders**
 
-A machine learning tool for predicting protein-protein binding across 24 human and viral targets,
-trained on experimental data from the Proteinbase dataset. RATAN-PBind integrates gradient-boosted
-ensemble models with large language model augmentation (Groq / Llama-3.3-70b) to bridge statistical
-binding prediction and mechanistic molecular interpretation.
+A machine-learning pre-screen for de novo binder campaigns across 24 human and viral targets,
+trained on experimental data from the Proteinbase dataset. It ranks candidates cheaply from
+sequence and reports a quantified applicability domain — where the predictions can and cannot
+be trusted — with a few-shot path to new targets.
 
 **Model**
-LightGBM with 509 features derived from ESM-2 protein language model embeddings,
-sequence composition, physicochemical properties, and Boltz2 structural predictions.
-The prototype similarity features — encoding how closely a candidate resembles known binders
-of each target in ESM-2 embedding space — are the most informative predictors.
+LightGBM on 470 features: ESM-2 target-conditioned prototype-similarity features, sequence
+composition, physicochemical properties, design-method priors, and Boltz2 structural metrics.
+The prototype-similarity features — how closely a candidate resembles known binders of each
+target in ESM-2 embedding space — are the most informative predictors.
 
-**Generative Design**
-RATAN-PBind includes a generative design engine combining directed evolution (RATAN-PBind as
-fitness oracle) and ESM-2 masked language model redesign, with AI interpretation of design
-trajectories via Groq Cloud.
+**Performance and applicability domain**
+Held-out AUROC 0.946 (nested-CV 0.895) in-distribution; ~0.77 on a new design campaign; ~0.55
+zero-shot to a novel target, recovering to ~0.70 with as few as two known binders (few-shot).
+Top-10% ranking enriches binders 4.8×. The model is a binder/non-binder classifier and does not
+rank affinity.
+
+**Optional modules**
+SHAP-grounded LLM interpretation (Groq / Llama-3.3-70b; ~87% faithful to the SHAP evidence) and a
+generative design helper (directed evolution + ESM-2 redesign) that proposes structurally
+plausible candidates for experimental testing.
 
 **Targets ({len(KNOWN_TARGETS)})**
 {", ".join(KNOWN_TARGETS)}
 
 **Dataset**
 This work used Proteinbase by Adaptyv Bio under the ODC-BY license.
-5,253 proteins · 2,643 labeled pairs · 40,479 experimental evaluations.
+5,253 proteins · 2,630 labeled pairs · experimental binding evaluations.
 
 **Citation**
-Paper in preparation.
-*RATAN-PBind: Residue Attribution and Target Affinity Network for Protein Binding*
+Paper under review (Journal of Cheminformatics).
+*RATAN-PBind: sequence-based prioritisation of de novo protein binders with a characterised
+applicability domain and few-shot extension to new targets*
 
 **License**
 Model: MIT · Dataset: Open Data Commons Attribution (ODC-By)
