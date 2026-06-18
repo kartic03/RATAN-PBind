@@ -1,0 +1,75 @@
+{
+  "base_rate_test": 0.171,
+  "budget_yield": [
+    {
+      "top_frac": 0.01,
+      "n": 4,
+      "precision": 0.75,
+      "recall": 0.045,
+      "enrichment": 4.39
+    },
+    {
+      "top_frac": 0.05,
+      "n": 20,
+      "precision": 0.9,
+      "recall": 0.269,
+      "enrichment": 5.27
+    },
+    {
+      "top_frac": 0.1,
+      "n": 39,
+      "precision": 0.795,
+      "recall": 0.463,
+      "enrichment": 4.65
+    },
+    {
+      "top_frac": 0.2,
+      "n": 78,
+      "precision": 0.667,
+      "recall": 0.776,
+      "enrichment": 3.9
+    }
+  ],
+  "ece_test_10bin": 0.058,
+  "ad": {
+    "cos_pos_5pct_threshold": 0.0,
+    "test_frac_in_domain": 1.0,
+    "auroc_near_prototype": 0.91,
+    "auroc_far_prototype": 0.977,
+    "n_near": 186,
+    "n_far": 206
+  },
+  "author_blind": {
+    "base_auroc": 0.746,
+    "proto_auroc": 0.761,
+    "delta": 0.015,
+    "delta_sd": 0.032
+  },
+  "fewshot": [
+    {
+      "k": 0,
+      "auroc": 0.574,
+      "auprc": 0.448
+    },
+    {
+      "k": 1,
+      "auroc": 0.648,
+      "auprc": 0.549
+    },
+    {
+      "k": 2,
+      "auroc": 0.7,
+      "auprc": 0.572
+    },
+    {
+      "k": 5,
+      "auroc": 0.704,
+      "auprc": 0.57
+    },
+    {
+      "k": 10,
+      "auroc": 0.728,
+      "auprc": 0.587
+    }
+  ]
+}
