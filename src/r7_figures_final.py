@@ -172,10 +172,10 @@ def fig5():
 
 # ── Figure 6 — few-shot ──────────────────────────────────────────────────────
 def fig6():
-    d=pd.read_csv(OUT/"r8b_fewshot_ci.csv")
+    d=pd.read_csv(OUT/"r11_fewshot_final.csv")
     fig,ax=plt.subplots(figsize=(7.8,5.0),layout="constrained")
     for yv in (0.5,0.6,0.7): ax.axhline(yv,color="#EEF1F4",lw=0.8,zorder=0)
-    ax.fill_between(d.k,d.ci_lo,d.ci_hi,alpha=0.16,color=C["blue"],lw=0,zorder=1)
+    ax.fill_between(d.k,d.auroc_ci_lo,d.auroc_ci_hi,alpha=0.16,color=C["blue"],lw=0,zorder=1)
     ax.plot(d.k,d.auroc,"-",color=C["blue"],lw=2.6,zorder=2)
     ax.plot(d.k,d.auroc,"o",color=C["blue"],ms=9,zorder=3,markeredgecolor="white",markeredgewidth=0.9)
     for _,r in d.iterrows(): ax.text(r.k,r.auroc+0.020,f"{r.auroc:.2f}",ha="center",fontsize=9,color="#5A626D")

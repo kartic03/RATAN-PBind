@@ -26,7 +26,7 @@ The contribution is an honest, quantified **applicability domain** rather than a
 
 - **470 features** (463 base + 7 prototype-similarity). `proto_ratio` is the top SHAP feature.
 - **Practical utility:** top-10% ranking enriches binders **4.7×** over the 17.1% test-set binding rate (top-5% reaches 90% precision, 5.3×).
-- **Few-shot:** adding ~2 known binders of a new target recovers AUROC from chance to **~0.70**.
+- **Few-shot:** adding ~2 known binders of a new target recovers AUROC from near chance to **~0.70**.
 - **Validated:** label-shuffle control, sequence- and batch-level leakage audits, nearest-neighbour and single-feature baselines, external (Overath 2025) and natural-PPI (SKEMPI 2.0) checks, and independent structural validation (Boltz-2 ipTM, MM-GBSA).
 - The model is a **binder/non-binder classifier** and does not rank affinity.
 
