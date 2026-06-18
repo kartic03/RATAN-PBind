@@ -18,9 +18,9 @@ The contribution is an honest, quantified **applicability domain** rather than a
 
 | Evaluation | AUROC |
 |---|---|
-| In-distribution, held-out test | **0.946** (95% CI 0.919-0.968) |
+| In-distribution, held-out test | **0.946** (95% CI 0.920-0.969) |
 | In-distribution, nested cross-validation (leakage-free) | **0.895 ± 0.006** |
-| Across design methods (leave-method/author-out) | 0.73-0.82 |
+| Across design methods (leave-author/method-out, prototypes recomputed per fold) | 0.70-0.76 |
 | Zero-shot to a novel target (LOTO) | 0.54-0.57 |
 | Independent dataset (after de-duplication) | ~0.49 |
 

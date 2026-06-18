@@ -1,0 +1,21 @@
+{
+  "model_file": "models/lgb_proto_470.pkl",
+  "n_features": 470,
+  "feature_groups": {
+    "base": 463,
+    "prototype": 7
+  },
+  "test_auroc": 0.946,
+  "test_auroc_ci": [
+    0.92,
+    0.969
+  ],
+  "test_auprc": 0.77,
+  "test_auprc_ci": [
+    0.652,
+    0.874
+  ],
+  "test_f1": 0.752,
+  "test_mcc": 0.701,
+  "seed": 42
+}

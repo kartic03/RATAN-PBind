@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""R8 Batch 2 - few-shot recovery curve. For a held-out target (LOTO), build its
+"""R8 Batch 2 — few-shot recovery curve. For a held-out target (LOTO), build its
 prototype from k known binders+non-binders ('shots'), predict the remaining pairs.
 Shows AUROC recovery vs k => deployment guideline for new targets. CPU."""
 import warnings, numpy as np, pandas as pd
@@ -63,4 +63,5 @@ rows=[]
 for k in KS:
     mu=np.mean(results[k]); print(f"  {('k=%d'%k):32s} {mu:10.3f}"); rows.append({"k":k,"mean_auroc":round(mu,3)})
 print(f"\n  k=0 (cold start) = {np.mean(results[0]):.3f}  ->  k=10 = {np.mean(results[10]):.3f}  (recovery +{np.mean(results[10])-np.mean(results[0]):.3f})")
-pd.DataFrame(rows).to_csv("outputs/r8_fewshot.csv",index=False); print("saved outputs/r8_fewshot.csv")
+# superseded by src/r8b_fewshot_ci.py (adds bootstrap CIs); canonical file = outputs/r8b_fewshot_ci.csv
+pd.DataFrame(rows).to_csv("outputs/r8_fewshot_superseded.csv",index=False); print("saved outputs/r8_fewshot_superseded.csv (superseded by r8b_fewshot_ci.csv)")
