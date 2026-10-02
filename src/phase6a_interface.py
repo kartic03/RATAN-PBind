@@ -146,7 +146,9 @@ def parse_positions(v):
     try:
         data = json.loads(v) if isinstance(v, str) else v
         if isinstance(data, list):
-            return [int(r["residue"]) for r in data if "residue" in r]
+            # chain B is the binder, chain A the target: keep the binder side only. The original
+            # parse kept both chains and indexed target residues into the binder sequence.
+            return [int(r["residue"]) for r in data if "residue" in r and r.get("chain") == "B"]
     except Exception:
         pass
     return []

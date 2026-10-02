@@ -227,7 +227,8 @@ if use_aug:
     def _parse_pos(v):
         try:
             data = _json.loads(v) if isinstance(v, str) else v
-            return [int(r["residue"]) for r in data if "residue" in r] if isinstance(data, list) else []
+            # binder chain (B) only; chain A is the target (see phase6a_interface.py)
+            return [int(r["residue"]) for r in data if "residue" in r and r.get("chain") == "B"] if isinstance(data, list) else []
         except: return []
     ir_rows["positions"] = ir_rows["value"].apply(_parse_pos)
     ir_rows = ir_rows[ir_rows["positions"].apply(len) > 0]
