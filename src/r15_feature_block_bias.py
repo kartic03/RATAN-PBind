@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Per-feature-block contribution, in-distribution vs across campaigns (Reviewer 3, comment 1).
+"""Per-feature-block contribution, in-distribution vs across campaigns.
 
 R3 asks for a rationale for the feature groups and warns that design-method metadata,
 historical success rates, target prototypes and structural scores "could also introduce

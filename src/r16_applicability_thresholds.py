@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Empirical basis for the applicability-domain thresholds (Reviewer 3, comment 2).
+"""Empirical basis for the applicability-domain thresholds.
 
 protbind/predictor.py hardcodes three regimes on n_pos, the target's known binders
 in the prototype database:

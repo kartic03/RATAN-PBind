@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deployment-matched ablation (Reviewer 1, comment 1).
+"""Deployment-matched ablation.
 
 The headline 470-feature model mixes inputs that differ sharply in what they cost
 to obtain at inference time. This script separates them and reports a ladder.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AUPRC and top-k enrichment under grouped prospective splits (Reviewer 1, comment 2).
+"""AUPRC and top-k enrichment under grouped prospective splits.
 
 outputs/r9_grouped_leakage.csv reports AUROC only. The manuscript states that at a
 17.8% binding rate, AUPRC and top-k enrichment are the decision-relevant metrics --

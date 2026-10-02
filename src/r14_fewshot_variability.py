@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Few-shot support-set variability and baselines (Reviewer 1, comment 3).
+"""Few-shot support-set variability and baselines.
 
-The reviewer asks (a) whether few-shot performance depends on WHICH support examples
+Two questions: (a) whether few-shot performance depends on WHICH support examples
 are drawn, and (b) how much of the gain is specific to RATAN-PBind rather than to
 simple prototype retrieval.
 

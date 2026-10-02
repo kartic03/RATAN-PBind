@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""External-validation reconciliation (Reviewer 1, comment 4): every row with its n, AUROC
+"""External-validation reconciliation: every row with its n, AUROC
 and AUPRC, regenerated from the released data.
 
 Covers

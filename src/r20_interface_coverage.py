@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Can a novel-interface (binding-site) split be run on these data? (Reviewer 2, comment 2)
+"""Can a novel-interface (binding-site) split be run on these data?
 
 The evaluations table carries Boltz-2-predicted interface residues for each modelled pair, as
 {chain, residue} records. Chain B is the binder (indices fit within the binder sequence in every
