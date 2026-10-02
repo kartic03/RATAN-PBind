@@ -254,9 +254,12 @@ class ProtBind:
         # binders the target carries in the prototype database (the validated AD axis).
         n_pos = int(self.n_pos_dict.get(target, 0))
         if n_pos >= 20:
-            regime, band = "in-domain", "data-rich target, in-distribution reliability (~0.90-0.95 AUROC)"
+            regime, band = "in-domain", ("20 or more known binders: about 0.73 AUROC for a fresh campaign on this target "
+                                         "and about 0.69 for a target held out of training; ~0.95 applies only when the campaign "
+                                         "is in the training data. Expect wide variation (10th-90th percentile 0.60-0.78 at 20 binders)")
         elif n_pos >= 2:
-            regime, band = "few-shot", "few-shot regime, expect ~0.70 AUROC; add more known binders to improve"
+            regime, band = "few-shot", ("2-19 known binders: about 0.63-0.69 AUROC for a target held out of training, "
+                                        "varying widely with which examples are supplied; add more known binders to improve")
         else:
             regime, band = "extrapolation", "no/insufficient prototype support; prediction is an extrapolation (near chance)"
         applicability = {
