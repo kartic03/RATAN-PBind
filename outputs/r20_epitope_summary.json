@@ -1,0 +1,20 @@
+{
+  "annotated_pairs": 1072,
+  "modelled_pairs": 2630,
+  "targets_with_annotation": 4,
+  "targets_total": 24,
+  "nipah_annotated": 1028,
+  "nipah_share": 0.959,
+  "nipah_binders": 101,
+  "distinct_residues": 457,
+  "residues_at_least_half": 23,
+  "max_residue_frequency": 0.757,
+  "consensus_cut_0.7": {
+    "cut": 0.7,
+    "dominant_consensus": 29,
+    "secondary_consensus": 79,
+    "shared": 27,
+    "jaccard": 0.333,
+    "dominant_residues_inside_secondary": 27
+  }
+}

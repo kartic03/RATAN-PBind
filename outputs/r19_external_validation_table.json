@@ -1,0 +1,101 @@
+{
+  "A": [
+    {
+      "method": "colab_iptm_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7340118846531757,
+      "auprc": 0.26175314710610426
+    },
+    {
+      "method": "boltz1_iptm_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7458827377206636,
+      "auprc": 0.25827163986568213
+    },
+    {
+      "method": "af3_iptm_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7636141517349495,
+      "auprc": 0.27373088541612933
+    },
+    {
+      "method": "colab_actifptm_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7360529206548979,
+      "auprc": 0.26286051773296326
+    },
+    {
+      "method": "boltz1_ipSAE_avg",
+      "n": 3756,
+      "binders": 436,
+      "auroc": 0.7717782828561954,
+      "auprc": 0.32713741941289104
+    },
+    {
+      "method": "af3_ipSAE_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7881714442641231,
+      "auprc": 0.33220567875109186
+    },
+    {
+      "method": "af2_pae_interaction",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7328692356948079,
+      "auprc": 0.23706726986333393
+    },
+    {
+      "method": "boltz1_complex_iplddt_avg",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7538108998774551,
+      "auprc": 0.2657439477060915
+    },
+    {
+      "method": "sequence_ML_5foldCV",
+      "n": 3760,
+      "binders": 436,
+      "auroc": 0.7302996990436584,
+      "auprc": 0.3524824896020637
+    }
+  ],
+  "A_base_rate": 0.11595744680851064,
+  "B": {
+    "with_overlap": {
+      "n": 913,
+      "binders": 153,
+      "targets": 5,
+      "base_rate": 0.16757940854326397,
+      "null_auroc": 0.7505288957688339,
+      "null_auprc": 0.38206232573251786
+    },
+    "de_duplicated": {
+      "n": 571,
+      "binders": 104,
+      "targets": 5,
+      "base_rate": 0.18213660245183888,
+      "null_auroc": 0.76818069510789,
+      "null_auprc": 0.423559185921483
+    }
+  },
+  "B_target_rates": {
+    "egfr": 0.089,
+    "human-insulin-receptor": 0.171,
+    "il7r": 0.054,
+    "mdm2": 0.564,
+    "pd-l1": 0.126
+  },
+  "C": {
+    "n": 3796,
+    "abolishing": 608,
+    "complexes": 271,
+    "auroc": 0.6920841920848944,
+    "auprc": 0.2830636017607111,
+    "base_rate": 0.1601685985247629
+  }
+}

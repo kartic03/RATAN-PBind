@@ -1,0 +1,5 @@
+tier,n_features,needs,cost,auroc,auroc_ci,auprc,top10_precision,top10_enrichment,f1,mcc
+A  sequence + prototype,437,sequence only; ESM-2 pass,sub-second (GPU),0.933,"[0.898, 0.962]",0.757,0.821,4.8,0.721,0.662
+B  + design-method metadata,454,+ campaign metadata,sub-second (GPU),0.941,"[0.913, 0.965]",0.757,0.821,4.8,0.729,0.671
+C  + ESMFold / ProteinMPNN,458,+ fold the binder,seconds-minutes,0.95,"[0.926, 0.969]",0.778,0.769,4.5,0.735,0.68
+D  + Boltz-2 (published 470),470,+ fold the complex,minutes-hours,0.946,"[0.92, 0.969]",0.77,0.795,4.65,0.752,0.701

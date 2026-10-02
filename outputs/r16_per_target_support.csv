@@ -1,0 +1,5 @@
+target,train_binders,test_n,test_binders,test_auroc
+egfr,109,123,19,0.99
+nipah-glycoprotein-g,88,154,15,0.935
+il7r,53,14,9,0.8
+pd-l1,33,12,6,0.806

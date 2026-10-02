@@ -1,0 +1,7 @@
+featset,split,folds,base_rate,auroc,auprc,top10_enrich,top10_prec
+437 deployment,leave-author-out,5,0.178,0.742,0.481,3.388,0.562
+437 deployment,leave-design_method-out,5,0.2,0.683,0.395,1.916,0.366
+437 deployment,leave-one-method-out,7,0.349,0.718,0.555,1.811,0.586
+470 published,leave-author-out,5,0.178,0.761,0.506,3.586,0.592
+470 published,leave-design_method-out,5,0.2,0.702,0.394,1.974,0.381
+470 published,leave-one-method-out,7,0.349,0.706,0.539,1.671,0.562

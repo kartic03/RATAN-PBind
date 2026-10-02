@@ -1,0 +1,6 @@
+cut,clusters,largest_pairs,largest_binders,secondary_pairs,secondary_binders,max_binders_any_other_cluster,usable_clusters
+0.5,221,538,69,51,0,3,1
+0.6,117,652,74,66,8,8,2
+0.7,53,692,79,67,8,8,2
+0.8,22,771,88,47,2,4,1
+0.9,8,778,88,161,7,7,2

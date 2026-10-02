@@ -1,0 +1,66 @@
+[
+  {
+    "tier": "A  sequence + prototype",
+    "n_features": 437,
+    "needs": "sequence only; ESM-2 pass",
+    "cost": "sub-second (GPU)",
+    "auroc": 0.933,
+    "auroc_ci": [
+      0.898,
+      0.962
+    ],
+    "auprc": 0.757,
+    "top10_precision": 0.821,
+    "top10_enrichment": 4.8,
+    "f1": 0.721,
+    "mcc": 0.662
+  },
+  {
+    "tier": "B  + design-method metadata",
+    "n_features": 454,
+    "needs": "+ campaign metadata",
+    "cost": "sub-second (GPU)",
+    "auroc": 0.941,
+    "auroc_ci": [
+      0.913,
+      0.965
+    ],
+    "auprc": 0.757,
+    "top10_precision": 0.821,
+    "top10_enrichment": 4.8,
+    "f1": 0.729,
+    "mcc": 0.671
+  },
+  {
+    "tier": "C  + ESMFold / ProteinMPNN",
+    "n_features": 458,
+    "needs": "+ fold the binder",
+    "cost": "seconds-minutes",
+    "auroc": 0.95,
+    "auroc_ci": [
+      0.926,
+      0.969
+    ],
+    "auprc": 0.778,
+    "top10_precision": 0.769,
+    "top10_enrichment": 4.5,
+    "f1": 0.735,
+    "mcc": 0.68
+  },
+  {
+    "tier": "D  + Boltz-2 (published 470)",
+    "n_features": 470,
+    "needs": "+ fold the complex",
+    "cost": "minutes-hours",
+    "auroc": 0.946,
+    "auroc_ci": [
+      0.92,
+      0.969
+    ],
+    "auprc": 0.77,
+    "top10_precision": 0.795,
+    "top10_enrichment": 4.65,
+    "f1": 0.752,
+    "mcc": 0.701
+  }
+]

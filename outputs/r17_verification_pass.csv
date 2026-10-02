@@ -1,0 +1,43 @@
+section,metric,published,recomputed,delta,verdict
+headline,AUROC,0.946,0.9459,-0.0001,reproduces
+headline,AUPRC,0.77,0.77,0.0,reproduces
+headline,F1 @0.5,0.752,0.7519,-0.0001,reproduces
+headline,MCC @0.5,0.701,0.7012,0.0002,reproduces
+headline,ECE (10 bins),0.058,0.0576,-0.0004,reproduces
+nested CV,AUROC mean,0.895,0.8946,-0.0004,reproduces
+nested CV,AUROC sd,0.006,0.0087,0.0027,reproduces
+Table S3,Full model (n=470) AUROC,0.946,0.9459,-0.0001,reproduces
+Table S3,Full model (n=470) AUPRC,0.77,0.77,0.0,reproduces
+Table S3,Without prototype (n=463) AUROC,0.88,0.8868,0.0068,close
+Table S3,Without prototype (n=463) AUPRC,0.713,0.6754,-0.0376,DRIFT
+Table S3,Without Boltz2 (n=458) AUROC,0.931,0.9498,0.0188,DRIFT
+Table S3,Without Boltz2 (n=458) AUPRC,0.751,0.7782,0.0272,DRIFT
+Table S3,Without design-method (n=453) AUROC,0.912,0.9368,0.0248,DRIFT
+Table S3,Without design-method (n=453) AUPRC,0.728,0.7525,0.0245,DRIFT
+Table S3,Sequence only (n=427) AUROC,0.821,0.9314,0.1104,DRIFT
+Table S3,Sequence only (n=427) AUPRC,0.581,0.7504,0.1694,DRIFT
+Table S2,AUROC mean,0.94,0.9466,0.0066,reproduces
+Table S2,AUROC sd,0.005,0.0006,-0.0044,reproduces
+Table S2,AUPRC mean,0.759,0.7775,0.0185,DRIFT
+Table S2,AUPRC sd,0.015,0.0045,-0.0105,DRIFT
+Table S2,F1 mean,0.718,0.744,0.026,DRIFT
+Table S2,F1 sd,0.019,0.011,-0.008,reproduces
+Table S2,MCC mean,0.664,0.6911,0.0271,DRIFT
+Table S2,MCC sd,0.02,0.0133,-0.0067,reproduces
+Table 3,label permutation,0.467,0.4588,-0.0082,close
+Table 4,proto_ratio alone,0.772,0.7724,0.0004,reproduces
+Table 4,ESM-2 nearest-centroid,0.75,0.6211,-0.1289,DRIFT
+Table 4,esmfold_plddt,,0.5448,,n/a
+Table 4,isoelectric_point,0.585,0.5848,-0.0002,reproduces
+Table 4,seq_length,0.54,0.5428,0.0028,reproduces
+Table 4,design-method success rate,0.719,0.7194,0.0004,reproduces
+Table 4,Boltz2 ipTM (nipah),0.682,0.6815,-0.0005,reproduces
+Table 7,test base rate,0.171,0.1709,-0.0001,reproduces
+Table 7,top-1% precision,0.75,0.75,0.0,reproduces
+Table 7,top-1% enrichment,4.4,4.3881,-0.0119,DRIFT
+Table 7,top-5% precision,0.9,0.9,0.0,reproduces
+Table 7,top-5% enrichment,5.3,5.2657,-0.0343,DRIFT
+Table 7,top-10% precision,0.795,0.7949,-0.0001,reproduces
+Table 7,top-10% enrichment,4.7,4.6506,-0.0494,DRIFT
+Table 7,top-20% precision,0.667,0.6667,-0.0003,reproduces
+Table 7,top-20% enrichment,3.9,3.9005,0.0005,reproduces

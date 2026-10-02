@@ -1,0 +1,7 @@
+Feature set,N,AUROC,AUPRC,dAUROC
+Full model,470,0.946,0.77,-
+Without prototype features,463,0.887,0.675,-0.059
+Without Boltz2 structural features,458,0.95,0.778,0.004
+Without design-method encoding,453,0.937,0.752,-0.009
+Sequence features only (AAC + DPC + physico),427,0.799,0.442,-0.147
+ESM-2 embeddings only,1280,0.803,0.427,-0.143

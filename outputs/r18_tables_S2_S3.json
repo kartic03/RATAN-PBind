@@ -1,0 +1,76 @@
+{
+  "table_s3": [
+    {
+      "Feature set": "Full model",
+      "N": 470,
+      "AUROC": 0.946,
+      "AUPRC": 0.77,
+      "dAUROC": "-"
+    },
+    {
+      "Feature set": "Without prototype features",
+      "N": 463,
+      "AUROC": 0.887,
+      "AUPRC": 0.675,
+      "dAUROC": -0.059
+    },
+    {
+      "Feature set": "Without Boltz2 structural features",
+      "N": 458,
+      "AUROC": 0.95,
+      "AUPRC": 0.778,
+      "dAUROC": 0.004
+    },
+    {
+      "Feature set": "Without design-method encoding",
+      "N": 453,
+      "AUROC": 0.937,
+      "AUPRC": 0.752,
+      "dAUROC": -0.009
+    },
+    {
+      "Feature set": "Sequence features only (AAC + DPC + physico)",
+      "N": 427,
+      "AUROC": 0.799,
+      "AUPRC": 0.442,
+      "dAUROC": -0.147
+    },
+    {
+      "Feature set": "ESM-2 embeddings only",
+      "N": 1280,
+      "AUROC": 0.803,
+      "AUPRC": 0.427,
+      "dAUROC": -0.143
+    }
+  ],
+  "table_s2": [
+    {
+      "Model": "LightGBM + Proto",
+      "AUROC": "0.946 +/- 0.000",
+      "AUPRC": "0.773 +/- 0.004",
+      "F1": "0.747 +/- 0.011",
+      "MCC": "0.695 +/- 0.013"
+    },
+    {
+      "Model": "XGBoost + Proto",
+      "AUROC": "0.944 +/- 0.002",
+      "AUPRC": "0.750 +/- 0.012",
+      "F1": "0.722 +/- 0.008",
+      "MCC": "0.665 +/- 0.009"
+    }
+  ],
+  "prototype_gain": {
+    "auroc": 0.0591,
+    "ci95": [
+      0.0282,
+      0.0977
+    ],
+    "p_gt_0": 1.0,
+    "auprc": 0.0946
+  },
+  "noise_floor": {
+    "mean": 0.9469,
+    "sd": 0.0017,
+    "range": 0.0062
+  }
+}
