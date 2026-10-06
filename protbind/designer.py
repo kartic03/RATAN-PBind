@@ -2,7 +2,7 @@
 protbind.designer - RATAN-PBind Generative AI protein binder design
 
 Two engines:
-  1. Directed Evolution  - RATAN-PBind as fitness oracle (genetic algorithm)
+  1. In silico directed evolution  - RATAN-PBind as fitness oracle (genetic algorithm)
   2. ESM-2 Redesign      - ESM-2 protein LM as generative model (masked prediction)
 
 Combined pipeline: Evolution → ESM-2 refinement → Groq AI interpretation
@@ -56,7 +56,7 @@ class ProtBindDesigner:
         if not hasattr(self.pb, "_esm_model"):
             self.pb._get_esm2_embedding(seq)
 
-    # ── Engine 1: Directed Evolution ──────────────────────────────────────
+    # ── Engine 1: In silico directed evolution ──────────────────────────────────────
 
     def directed_evolution(
         self,
@@ -70,7 +70,7 @@ class ProtBindDesigner:
         progress_cb: Optional[Callable] = None,
     ) -> dict:
         """
-        (μ+λ) directed evolution with RATAN-PBind as fitness oracle.
+        (μ+λ) in silico directed evolution with RATAN-PBind as fitness oracle.
 
         Each generation:
           score all → select elite fraction → reproduce via mutation/crossover
@@ -373,7 +373,7 @@ class ProtBindDesigner:
         Full design pipeline.
 
         Modes:
-          'evolution' : directed evolution only
+          'evolution' : in silico directed evolution only
           'esm2'      : ESM-2 redesign only
           'combined'  : evolution → ESM-2 refinement of top candidates (recommended)
         """
@@ -393,7 +393,7 @@ class ProtBindDesigner:
             )
 
         # ── Combined: evolution then ESM-2 refinement ─────────────────────
-        # Stage 1: directed evolution
+        # Stage 1: in silico directed evolution
         evo = self.directed_evolution(
             target=target, seed_sequence=seed_sequence,
             n_generations=n_generations, population_size=population_size,
