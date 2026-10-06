@@ -10,7 +10,7 @@ import warnings; warnings.filterwarnings("ignore")
 
 ROOT = Path(__file__).parent.parent
 OUT  = ROOT / "outputs"
-FIG  = ROOT / "paper" / "Journal of Cheminformatics" / "figures"
+FIG  = ROOT / "figures"
 FIG.mkdir(parents=True, exist_ok=True)
 
 # Refined, cohesive palette (deep blue / teal / amber / coral / slate)
