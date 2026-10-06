@@ -417,7 +417,7 @@ def run_design(
     if len(seed_sequence) > 400:
         return None, None, None, "Sequence too long for design (max 400 residues)."
 
-    mode_key = {"Directed Evolution": "evolution",
+    mode_key = {"In silico directed evolution": "evolution",
                 "ESM-2 Redesign":     "esm2",
                 "Combined (recommended)": "combined"}.get(mode, "combined")
 
@@ -1066,7 +1066,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
             gr.HTML("""
             <p style="font-size:13px;color:#64748B;margin-bottom:4px;">
             Generative AI protein binder design. Two engines work together:
-            <strong>Directed Evolution</strong> uses RATAN-PBind as a fitness oracle to search
+            <strong>In silico directed evolution</strong> uses RATAN-PBind as a fitness oracle to search
             sequence space via a genetic algorithm.
             <strong>ESM-2 Redesign</strong> uses the ESM-2 protein language model (trained on
             250 million sequences) to propose chemically plausible alternatives at weak positions.
@@ -1087,7 +1087,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
 
                     gr.HTML('<p class="section-label" style="margin-top:14px;">Design mode</p>')
                     design_mode = gr.Radio(
-                        choices=["Directed Evolution", "ESM-2 Redesign", "Combined (recommended)"],
+                        choices=["In silico directed evolution", "ESM-2 Redesign", "Combined (recommended)"],
                         value="Combined (recommended)",
                         label="")
 
@@ -1171,7 +1171,7 @@ rank affinity.
 
 **Optional modules**
 SHAP-grounded LLM interpretation (Groq / Llama-3.3-70b; ~87% faithful to the SHAP evidence) and a
-generative design helper (directed evolution + ESM-2 redesign) that proposes structurally
+generative design helper (in silico directed evolution + ESM-2 redesign) that proposes structurally
 plausible candidates for experimental testing.
 
 **Targets ({len(KNOWN_TARGETS)})**
