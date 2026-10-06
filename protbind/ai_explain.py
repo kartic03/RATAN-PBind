@@ -322,9 +322,9 @@ def build_design_prompt(
     )
 
     mode_desc = {
-        "evolution": "Directed Evolution (genetic algorithm, RATAN-PBind oracle)",
+        "evolution": "In silico directed evolution (genetic algorithm, RATAN-PBind oracle)",
         "esm2":      "ESM-2 Masked Language Model Redesign",
-        "combined":  "Combined pipeline: Directed Evolution → ESM-2 Refinement",
+        "combined":  "Combined pipeline: in silico directed evolution → ESM-2 Refinement",
     }.get(mode, mode)
 
     prompt = f"""Generative protein binder design results - requires scientific interpretation.
