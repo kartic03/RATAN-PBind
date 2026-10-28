@@ -29,7 +29,7 @@ numbering.
 
     pixi run -e ml python src/r22_revision2_figures.py
 """
-import json, shutil
+import io, json, os, re, shutil
 import numpy as np, pandas as pd, matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt, matplotlib.patches as mpatches
@@ -46,9 +46,19 @@ FIG.mkdir(parents=True, exist_ok=True)
 C = dict(blue="#2C6FB3", teal="#2E9E8E", amber="#E0A33E", coral="#CB5A4C",
          slate="#7A8290", lgray="#C7CCD2", ink="#222831", purple="#7E6BB5")
 
+import matplotlib.font_manager as fm
+
+# Arial only. A substituted face changes every metric, and the graphical
+# abstract has to hold its layout inside 920 x 300 px, so a missing Arial is a
+# hard stop rather than a silent fallback.
+_ARIAL = fm.findfont(fm.FontProperties(family="Arial"), fallback_to_default=False)
+if "arial" not in os.path.basename(_ARIAL).lower():
+    raise SystemExit("Arial not found; matplotlib resolved %r" % _ARIAL)
+
 plt.rcParams.update({
     "font.family": "sans-serif",
-    "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
+    "font.sans-serif": ["Arial"],
+    "pdf.fonttype": 42, "ps.fonttype": 42,
     "font.size": 10.5, "axes.titlesize": 11.5, "axes.labelsize": 11.5,
     "axes.titleweight": "normal", "axes.titlepad": 8,
     "xtick.labelsize": 10, "ytick.labelsize": 10, "legend.fontsize": 9.5,
@@ -300,120 +310,453 @@ def fig8():
     save("fig8_structural_validation")
 
 
-# ── Graphical abstract ───────────────────────────────────────────────────────
+# ── Graphical abstract ────────────────────────────────────────────
+# Panel 1 draws a real backbone. The cartoon renderer below is a small stand-in
+# for PyMOL: helical stretches come from the CA(i) to CA(i+4) distance and are
+# drawn as a quad strip that twists with the helix, loops as a round-capped
+# tube, everything depth sorted and Lambert shaded.
+from matplotlib.collections import PolyCollection, LineCollection
+from scipy.interpolate import splprep, splev
+
+PDB = str(ROOT / "data/structures/designed_0_binder_chainA.pdb")
+
+
+def ca_trace(pdb, chain="A"):
+    return np.array([(float(l[30:38]), float(l[38:46]), float(l[46:54]))
+                     for l in open(pdb)
+                     if l.startswith("ATOM") and l[12:16].strip() == "CA" and l[21] == chain])
+
+
+def helical(ca, cut=6.4):
+    h = np.zeros(len(ca), bool)
+    for i, ok in enumerate(np.linalg.norm(ca[4:] - ca[:-4], axis=1) < cut):
+        if ok:
+            h[i:i + 5] = True
+    return h
+
+
+def runs(mask):
+    out, i, n = [], 0, len(mask)
+    while i < n:
+        j = i
+        while j + 1 < n and mask[j + 1] == mask[i]:
+            j += 1
+        out.append((i, j, bool(mask[i])))
+        i = j + 1
+    return out
+
+
+def clean(mask, gap=0, min_len=7):
+    """Drop helices too short to carry a ribbon frame, and optionally close
+    very short breaks. Breaks of one or two residues between helices in a
+    bundle are real turns, so gap defaults to 0 and only the length filter
+    runs."""
+    m = mask.copy()
+    for i, j, v in runs(m):
+        if not v and 0 < i and j < len(m) - 1 and j - i + 1 <= gap:
+            m[i:j + 1] = True
+    for i, j, v in runs(m):
+        if v and j - i + 1 < min_len:
+            m[i:j + 1] = False
+    return m
+
+
+def orient(ca, tilt, roll, flip=False):
+    p = ca - ca.mean(0)
+    _, _, vt = np.linalg.svd(p, full_matrices=False)
+    p = p @ vt.T
+    if flip:
+        p[:, 2] *= -1
+    c, s = np.cos(tilt), np.sin(tilt)
+    p = p @ np.array([[c, 0, -s], [0, 1, 0], [s, 0, c]])
+    c, s = np.cos(roll), np.sin(roll)
+    p = p @ np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
+    return p
+
+
+def unit(v):
+    return v / np.maximum(np.linalg.norm(v, axis=-1, keepdims=True), 1e-9)
+
+
+def resample(pts, per=10):
+    if len(pts) < 4:
+        t = np.linspace(0, 1, len(pts))
+        tt = np.linspace(0, 1, max(4, len(pts) * per))
+        return np.stack([np.interp(tt, t, pts[:, k]) for k in range(3)], 1)
+    tck, _ = splprep(pts.T, s=0, k=3)
+    return np.asarray(splev(np.linspace(0, 1, len(pts) * per), tck)).T
+
+
+def build(p, mask, width=2.2, per=6, taper=2.0):
+    """Primitives in the oriented Angstrom frame: (kind, xyz..., normal).
+
+    The ribbon rides on the CA helix, as PyMOL's does, and its plane comes from
+    the vector between the helix axis and the CA. The axis is a running mean of
+    four CAs, extrapolated at both ends: clamping the window there was what made
+    the first and last turn flare out.
+    """
+    prims = []
+    for i, j, is_h in runs(mask):
+        if is_h:
+            seg = p[i:j + 1]
+            k = len(seg)
+            axis = np.full((k, 3), np.nan)
+            for m in range(1, k - 2):
+                axis[m] = seg[m - 1:m + 3].mean(0)
+            axis[0] = 2 * axis[1] - axis[2]
+            axis[k - 2] = 2 * axis[k - 3] - axis[k - 4]
+            axis[k - 1] = 2 * axis[k - 2] - axis[k - 3]
+            sp = resample(seg, per)
+            sa = resample(axis, per)
+            r = unit(sp - sa)
+            t = unit(np.gradient(sa, axis=0))
+            r = unit(r - t * (r * t).sum(1, keepdims=True))
+            s_ = unit(np.cross(t, r))
+            n = len(sp)
+            u = np.linspace(0, k - 1, n)                  # residue coordinate
+            w = width * np.clip(np.minimum(u, (k - 1) - u) / taper, 0.30, 1.0)
+            left, right = sp + s_ * (w[:, None] / 2), sp - s_ * (w[:, None] / 2)
+            nrm = unit(np.cross(s_, t))
+            for m in range(n - 1):
+                prims.append(("quad",
+                              np.array([left[m], right[m], right[m + 1], left[m + 1]]),
+                              nrm[m]))
+        else:
+            if j - i + 1 < 2 and (i == 0 or j == len(p) - 1):
+                continue                        # a lone terminal residue is a stub
+            # run into the neighbouring helices so the tube and the ribbon meet
+            a, b = max(0, i - 2), min(len(p) - 1, j + 2)
+            if b - a < 2:
+                continue
+            c = resample(p[a:b + 1], per)
+            for m in range(len(c) - 1):
+                prims.append(("tube", c[m:m + 2], None))
+    return prims
+
+
+def shade(base, depth, lam):
+    base = np.asarray(matplotlib.colors.to_rgb(base))
+    lit = np.clip(base * (0.58 + 0.52 * lam), 0, 1)
+    return np.clip(lit * (1 - 0.34 * depth) + 0.34 * depth, 0, 1)
+
+
+def draw_cartoon(ax, ca, tilt=0.7, roll=0.35, flip=False, helix="#1668AD",
+                 loop="#2E86C8", edge="#0C4474", width=2.2, tube=1.5, lwedge=0.5,
+                 light=(-0.30, 0.50, 0.81)):
+    """width and tube are Angstroms; the tube is converted to points from the
+    axes geometry so it keeps its proportion to the ribbon at any figure size."""
+    p = orient(ca, tilt, roll, flip)
+    prims = build(p, clean(helical(ca)), width=width)
+
+    xy = np.concatenate([q[:, :2] for _, q, _ in prims])
+    lo, hi = xy.min(0), xy.max(0)
+    sc = (hi - lo).max()
+    zs = np.concatenate([q[:, 2] for _, q, _ in prims])
+    z0, z1 = zs.min(), zs.max()
+    L = np.asarray(light, float)
+    L /= np.linalg.norm(L)
+
+    items = []
+    for kind, q, nm in prims:
+        d = float((q[:, 2].mean() - z0) / (z1 - z0 + 1e-9))
+        g = (q[:, :2] - lo) / sc
+        if kind == "quad":
+            items.append((q[:, 2].mean(), kind, g, shade(helix, d, abs(float(nm @ L)))))
+        elif kind == "tube":
+            items.append((q[:, 2].mean(), kind, g, shade(loop, d, 0.74)))
+        else:
+            items.append((q[:, 2].mean() + 1e-6, kind, g, edge))
+    items.sort(key=lambda t: t[0])
+
+    # paint in depth bands so the fills and the outlines keep their order
+    tubes = []
+    z = 2.0
+    k = 0
+    while k < len(items):
+        kind = items[k][1]
+        m = k
+        while m < len(items) and items[m][1] == kind:
+            m += 1
+        chunk = items[k:m]
+        if kind == "quad":
+            cols = [c[3] for c in chunk]
+            ax.add_collection(PolyCollection([c[2] for c in chunk],
+                                             facecolors=cols, edgecolors=cols,
+                                             linewidths=0.35, zorder=z, snap=False))
+        elif kind == "tube":
+            lc = LineCollection([c[2] for c in chunk], colors=[c[3] for c in chunk],
+                                capstyle="round", joinstyle="round", zorder=z)
+            tubes.append(lc)
+            ax.add_collection(lc)
+        else:
+            ax.add_collection(LineCollection([c[2] for c in chunk],
+                                             colors=[c[3] for c in chunk],
+                                             linewidths=lwedge, capstyle="round",
+                                             zorder=z))
+        z += 0.0005
+        k = m
+    w, h = (hi - lo) / sc
+    ax.set_xlim(-0.04, w + 0.04)
+    ax.set_ylim(-0.06, h + 0.06)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    lw = tube_points(ax.figure, ax, sc, tube)
+    for lc in tubes:
+        lc.set_linewidth(lw)
+    return w, h
+
+
+def tube_points(fig, ax, sc, tube_a):
+    """Angstroms to points for the current axes, taking the binding dimension."""
+    fw, fh = fig.get_size_inches()
+    pos = ax.get_position()
+    xr = ax.get_xlim()[1] - ax.get_xlim()[0]
+    yr = ax.get_ylim()[1] - ax.get_ylim()[0]
+    ppu = min(fw * pos.width * 72 / xr, fh * pos.height * 72 / yr)
+    return tube_a / sc * ppu
+
+
 def graphical_abstract():
+    """920 x 300 px, white, under 150 KB, as the journal specifies.
+
+    Drawn at 4x and resampled, so the type is supersampled rather than
+    rendered at 100 dpi. Every label is measured against its column before
+    the file is written. Panel 1 is the Boltz-2 backbone of the
+    oracle-designed PD-L1 binder of Figure 8 (chain A of designed_0).
+    Values: 0.895 nested CV (Table 6), 0.761 and 0.702 grouped splits
+    (Table S8), 0.571 target-blind LOTO, 0.503 independent dataset
+    (Table S11), 4.65x top-decile enrichment (r10_budget_yield.csv).
+    """
     from PIL import Image
-    BLUE, TEAL, AMBER, CORAL = "#2C6FB3", "#1F9E89", "#E0A33E", "#CB5A4C"
-    SLATE, INK, LINE = "#5A626D", "#1E2530", "#D7DEE6"
-    TINT_B, TINT_N, TINT_T = "#EEF4FB", "#F6F8FA", "#ECF7F3"
-
-    fig = plt.figure(figsize=(9.2, 3.0), dpi=100)
+    W, H, SS = 920, 300, 4
+    INK, GREY, FAINT = "#15222D", "#79838E", "#A9B2BA"
+    RULE, HAIR = "#D9DEE3", "#E8ECEF"
+    BLUE, BLUE_M, BLUE_L = "#1A6AAC", "#5E9BC9", "#A8C7E0"
+    AMBER, CORAL = "#D2922A", "#C14F3E"
+    fig = plt.figure(figsize=(W / 100, H / 100), dpi=100)
     fig.patch.set_facecolor("white")
-    ax = fig.add_axes([0, 0, 1, 1]); ax.axis("off"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
 
-    def card(x, y, w, h, fill):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.006,rounding_size=0.03",
-                     facecolor=fill, edgecolor=LINE, linewidth=1.1, zorder=1))
+    C1, E1 = 0.028, 0.268
+    C2, E2 = 0.318, 0.592
+    C3, E3 = 0.642, 0.974
+    DIV1, DIV2 = 0.293, 0.617
 
-    def connect(x1, x2, y=0.46):
-        ax.add_patch(FancyArrowPatch((x1, y), (x2, y), arrowstyle="-|>", mutation_scale=16,
-                     color=SLATE, lw=2.4, zorder=6, shrinkA=0, shrinkB=0))
+    TEXTS = []
 
-    card(0.015, 0.10, 0.205, 0.72, TINT_B)
-    card(0.275, 0.10, 0.330, 0.72, TINT_N)
-    card(0.660, 0.10, 0.325, 0.72, TINT_T)
-    connect(0.222, 0.273); connect(0.607, 0.658)
 
-    ax.text(0.015, 0.95, "RATAN-PBind", fontsize=13.5, fontweight="bold", color=INK, va="center")
-    ax.text(0.985, 0.95, "sequence-based de novo binder pre-screening",
-            fontsize=8.6, color=SLATE, va="center", ha="right", style="italic")
+    def T(x, y, s, size, color=GREY, weight="normal", ha="left", va="center",
+          style="normal", ls=1.4, col=None):
+        t = ax.text(x, y, s, fontsize=size, color=color, fontweight=weight, ha=ha,
+                    va=va, style=style, linespacing=ls, zorder=5)
+        TEXTS.append((t, col))
+        return t
 
-    # card 1 — amino-acid sequence, not codons
-    ax.text(0.1175, 0.74, "De novo binder candidate", fontsize=9.2, fontweight="bold",
-            ha="center", color=INK)
-    seq = "MASWKELLVQRTI"
-    cls = {**{a: AMBER for a in "AMLVIWFPG"}, **{a: TEAL for a in "STQNCY"},
-           **{a: BLUE for a in "KRH"}, **{a: CORAL for a in "ED"}}
-    n = len(seq); cw = 0.0135; x0 = 0.1175 - n * cw / 2
+
+    def rule(x0, x1, y, color=RULE, lw=0.9):
+        ax.plot([x0, x1], [y, y], color=color, lw=lw, solid_capstyle="butt", zorder=1)
+
+
+    def vrule(x, y0, y1):
+        ax.plot([x, x], [y0, y1], color=RULE, lw=0.9, solid_capstyle="butt", zorder=1)
+
+
+    def chevron(x, y, size=0.011):
+        ax.add_patch(FancyArrowPatch((x - size, y), (x + size, y), arrowstyle="-|>",
+                                     mutation_scale=7, color=FAINT, lw=1.0,
+                                     shrinkA=0, shrinkB=0, zorder=4))
+
+
+    for i, (x, n, t) in enumerate(((C1, "1", "DE NOVO CANDIDATES"),
+                                   (C2, "2", "TARGET-CONDITIONED MODEL"),
+                                   (C3, "3", "APPLICABILITY DOMAIN"))):
+        T(x, 0.890, n, 7.0, BLUE, "bold", col=i)
+        T(x + 0.021, 0.890, t, 7.3, INK, "bold", col=i)
+    rule(C1, E1, 0.848)
+    rule(C2, E2, 0.848)
+    rule(C3, E3, 0.848)
+    vrule(DIV1, 0.13, 0.885)
+    vrule(DIV2, 0.13, 0.885)
+    chevron(DIV1, 0.50)
+    chevron(DIV2, 0.50)
+
+    # ── 1 — candidates ──────────────────────────────────────────────────────────
+    seq = "MASWKELLV"
+    fam = {**{a: BLUE for a in "KRH"}, **{a: BLUE_M for a in "STQNCY"},
+           **{a: "#A7B1BA" for a in "AMLVIWFPG"}, **{a: CORAL for a in "ED"}}
+    cw, ch = 0.0235, 0.088
+    x0 = C1 + 0.002
     for i, a in enumerate(seq):
-        ax.add_patch(FancyBboxPatch((x0 + i * cw, 0.44), cw * 0.86, 0.12,
-                     boxstyle="round,pad=0,rounding_size=0.015",
-                     facecolor=cls.get(a, SLATE), edgecolor="white", linewidth=0.6, zorder=3))
-        ax.text(x0 + i * cw + cw * 0.43, 0.50, a, fontsize=5.6, ha="center", va="center",
-                color="white", zorder=4)
-    ax.text(0.1175, 0.355, "amino-acid sequence", fontsize=7.4, ha="center",
-            color=SLATE, style="italic")
-    ax.text(0.1175, 0.20, "24 targets · 2,630 pairs", fontsize=8.4, ha="center",
-            color=INK, fontweight="bold")
+        ax.add_patch(FancyBboxPatch((x0 + i * cw, 0.726), cw * 0.86, ch,
+                     boxstyle="round,pad=0,rounding_size=0.011",
+                     facecolor=fam.get(a, FAINT), edgecolor="white", lw=0.6, zorder=3))
+        ax.text(x0 + i * cw + cw * 0.43, 0.726 + ch / 2, a, fontsize=4.7, ha="center",
+                va="center", color="white", zorder=4, fontweight="bold")
+    axr = fig.add_axes([C1 + 0.006, 0.312, 0.228, 0.408])
+    axr.set_facecolor("none")
+    draw_cartoon(axr, ca_trace(PDB), tilt=0.70, roll=0.15, width=3.2, tube=1.5)
 
-    # card 2
-    ax.text(0.440, 0.74, "Target-conditioned prototype similarity", fontsize=9.2,
-            fontweight="bold", ha="center", color=INK)
-    axp = fig.add_axes([0.315, 0.295, 0.250, 0.36]); axp.set_facecolor("none")
-    rng = np.random.default_rng(7)
-    b = rng.normal([0.30, 0.50], [0.10, 0.135], (70, 2))
-    nn = rng.normal([0.70, 0.52], [0.10, 0.135], (70, 2))
-    axp.scatter(b[:, 0], b[:, 1], s=14, color=BLUE, alpha=0.45, edgecolor="none", zorder=2)
-    axp.scatter(nn[:, 0], nn[:, 1], s=14, color="#AEB7C2", alpha=0.55, edgecolor="none", zorder=2)
-    axp.annotate("", xy=(0.40, 0.50), xytext=(0.52, 0.45),
-                 arrowprops=dict(arrowstyle="-|>", color=AMBER, lw=1.8, shrinkA=2, shrinkB=4))
-    axp.scatter([0.52], [0.45], s=150, marker="*", color=AMBER, edgecolor=INK,
-                linewidths=0.7, zorder=5)
-    axp.set_xlim(0, 1); axp.set_ylim(0.08, 0.95); axp.axis("off")
-    ax.text(0.440, 0.235, "ESM-2 embedding  →  LightGBM · 470 features",
-            fontsize=7.8, ha="center", color=INK)
-    ly = 0.155
-    for lx, col, lab, mk in [(0.345, BLUE, "binders", "o"), (0.425, "#AEB7C2", "non-binders", "o"),
-                             (0.535, AMBER, "candidate", "*")]:
-        ax.scatter(lx, ly, s=(46 if mk == "*" else 26), marker=mk, color=col,
-                   edgecolor=(INK if mk == "*" else "none"), linewidths=0.4, zorder=4)
-        ax.text(lx + 0.011, ly, lab, fontsize=6.8, va="center", color=SLATE)
+    T(C1 + 0.002, 0.286, "a de novo binder, predicted structure", 5.8, GREY,
+      style="italic", col=0)
+    rule(C1, E1, 0.244, HAIR)
+    T(C1 + 0.002, 0.172, "2,630", 12.0, INK, "bold", col=0)
+    T(C1 + 0.079, 0.166, "labelled pairs", 6.3, GREY, col=0)
+    T(C1 + 0.002, 0.098, "24 targets  ·  17.8% bind", 6.3, GREY, col=0)
 
-    # card 3 — all five axes of Figure 4, in the same order
-    ax.text(0.8225, 0.74, "Ranked binders + applicability domain", fontsize=9.2,
-            fontweight="bold", ha="center", color=INK)
-    axg = fig.add_axes([0.700, 0.260, 0.160, 0.345])
+    # ── 2 — the model ───────────────────────────────────────────────────────────
+    axp = fig.add_axes([C2 + 0.006, 0.470, 0.134, 0.340])
+    axp.set_facecolor("none")
+    axp.axis("off")
+    axp.set_xlim(0, 1)
+    axp.set_ylim(0, 1)
+    rng = np.random.default_rng(11)
+    pos = rng.normal([0.27, 0.50], [0.085, 0.145], (60, 2))
+    neg = rng.normal([0.72, 0.46], [0.090, 0.150], (60, 2))
+    axp.scatter(neg[:, 0], neg[:, 1], s=7.5, color="#C8D0D7", edgecolor="none", zorder=2)
+    axp.scatter(pos[:, 0], pos[:, 1], s=7.5, color=BLUE_L, edgecolor="none", zorder=2)
+    axp.scatter([0.27], [0.50], s=40, marker="P", color=BLUE, edgecolor="white",
+                linewidths=0.8, zorder=5)
+    axp.scatter([0.72], [0.46], s=40, marker="P", color="#8A949C", edgecolor="white",
+                linewidths=0.8, zorder=5)
+    axp.annotate("", xy=(0.325, 0.495), xytext=(0.495, 0.265),
+                 arrowprops=dict(arrowstyle="-|>", color=AMBER, lw=1.1, shrinkA=1, shrinkB=3))
+    axp.scatter([0.505], [0.248], s=62, marker="*", color=AMBER, edgecolor=INK,
+                linewidths=0.5, zorder=6)
+    axp.text(0.27, 0.96, "binders", fontsize=5.4, color=BLUE, ha="center", va="center")
+    axp.text(0.74, 0.92, "non-binders", fontsize=5.4, color="#8A949C", ha="center", va="center")
+    axp.text(0.56, 0.165, "candidate", fontsize=5.4, color=AMBER, ha="left", va="center")
+
+    T(C2 + 0.166, 0.712, "ESM-2 embedding", 6.6, INK, "bold", col=1)
+    T(C2 + 0.166, 0.645, "7 prototype features:\ncosine to the target's\nown binder and\nnon-binder means",
+      5.8, GREY, va="top", col=1)
+    rule(C2, E2, 0.420, HAIR)
+    T(C2 + 0.002, 0.355, "+ composition, physicochemical, design-method\n"
+      "   and structure-derived scores", 5.8, GREY, col=1)
+    rule(C2, E2, 0.276, HAIR)
+    T(C2 + 0.002, 0.205, "LightGBM", 8.2, INK, "bold", col=1)
+    T(C2 + 0.093, 0.200, "470 features", 6.3, GREY, col=1)
+    T(C2 + 0.002, 0.120, "a new target enters through its prototype, no retraining",
+      5.8, GREY, style="italic", col=1)
+
+    # ── 3 — the measured gradient ───────────────────────────────────────────────
+    axg = fig.add_axes([C3 + 0.022, 0.300, 0.170, 0.455])
     vals = [0.895, 0.761, 0.702, 0.571, 0.503]
-    cols = [TEAL, AMBER, AMBER, CORAL, CORAL]
-    labs = ["in-\ndist.", "new\ncamp.", "x-\nmeth.", "new\ntarget", "new\ndata"]
-    axg.plot(range(5), vals, color=LINE, lw=1.6, zorder=1)
-    axg.scatter(range(5), vals, c=cols, s=34, zorder=3, edgecolor="white", linewidths=0.8)
-    axg.axhline(0.5, ls=(0, (3, 2)), color="#C2C8D0", lw=1)
-    axg.set_ylim(0.45, 0.98); axg.set_xlim(-0.45, 4.45)
-    axg.set_xticks(range(5))
-    axg.set_xticklabels(labs, fontsize=5.0, color=SLATE, linespacing=0.9)
-    axg.set_yticks([0.5, 0.7, 0.9]); axg.tick_params(labelsize=5.8, length=2, colors=SLATE, pad=1.5)
-    axg.set_ylabel("AUROC", fontsize=6.2, color=SLATE, labelpad=1)
-    for sp in ["top", "right"]:
-        axg.spines[sp].set_visible(False)
-    for sp in ["left", "bottom"]:
-        axg.spines[sp].set_color("#C2C8D0")
-    ax.text(0.922, 0.615, "4.65×", fontsize=17, fontweight="bold", color=TEAL,
-            ha="center", va="center")
-    ax.text(0.922, 0.520, "enrichment", fontsize=8.0, color=INK, ha="center", va="center")
-    ax.text(0.922, 0.460, "top 10%, in-distribution", fontsize=5.9, color=SLATE,
-            ha="center", va="center")
-    ax.text(0.922, 0.350, "few-shot", fontsize=8.4, fontweight="bold", color=BLUE,
-            ha="center", va="center")
-    ax.text(0.922, 0.290, "2 labels per class", fontsize=5.9, color=SLATE,
-            ha="center", va="center")
-    ax.text(0.922, 0.240, "on a new target", fontsize=5.9, color=SLATE,
-            ha="center", va="center")
+    cols = [BLUE, BLUE, AMBER, CORAL, CORAL]
+    labs = ["in\ndistribution", "new\nauthor", "new\nmethod", "new\ntarget", "new\ndataset"]
+    xs = np.arange(5)
+    axg.fill_between(xs, 0.5, vals, color=BLUE, alpha=0.06, lw=0, zorder=1)
+    axg.plot(xs, vals, color="#C3CBD2", lw=1.2, zorder=2)
+    axg.scatter(xs, vals, c=cols, s=26, zorder=4, edgecolor="white", linewidths=0.9)
+    axg.axhline(0.5, ls=(0, (2.6, 2.2)), color=FAINT, lw=0.85, zorder=1)
+    axg.text(0, 0.945, "0.895", fontsize=6.3, color=BLUE, ha="center", va="bottom",
+             fontweight="bold")
+    axg.text(4, 0.548, "0.503", fontsize=6.3, color=CORAL, ha="center", va="bottom",
+             fontweight="bold")
+    axg.text(2.1, 0.513, "chance", fontsize=5.1, color=FAINT, ha="center", va="bottom")
+    axg.set_xlim(-0.55, 4.6)
+    axg.set_ylim(0.43, 1.02)
+    axg.set_xticks(xs)
+    axg.set_xticklabels(labs, fontsize=4.8, color=GREY, linespacing=1.1)
+    axg.set_yticks([0.5, 0.7, 0.9])
+    axg.set_yticklabels(["0.5", "0.7", "0.9"], fontsize=5.1, color=GREY)
+    axg.tick_params(length=1.5, width=0.7, colors=FAINT, pad=1.5)
+    axg.set_ylabel("AUROC", fontsize=5.7, color=GREY, labelpad=1.2)
+    for s in ("top", "right"):
+        axg.spines[s].set_visible(False)
+    for s in ("left", "bottom"):
+        axg.spines[s].set_color(RULE)
+        axg.spines[s].set_linewidth(0.8)
 
-    ax.text(0.5, 0.035, "Cheap, interpretable sequence model with a measured applicability domain "
-            "and few-shot extension to new targets", fontsize=7.4, color=SLATE,
-            ha="center", va="center")
+    SX = C3 + 0.212
+    T(SX, 0.735, "4.65\u00d7", 14.5, BLUE, "bold", col=2)
+    T(SX, 0.628, "top-decile enrichment,\nin distribution", 5.8, GREY, col=2)
+    rule(SX, E3, 0.560, HAIR)
+    T(SX, 0.495, "0.70\u20130.76", 9.5, INK, "bold", col=2)
+    T(SX, 0.400, "fresh campaign,\nknown target", 5.8, GREY, col=2)
+    rule(SX, E3, 0.330, HAIR)
+    T(SX, 0.245, "2 + 2 labels", 9.0, INK, "bold", col=2)
+    T(SX, 0.150, "move an unseen\ntarget to about 0.70", 5.8, GREY, col=2)
 
-    p = FIG / "graphical_abstract.png"
-    fig.savefig(p, dpi=100, facecolor="white", pad_inches=0)
-    plt.close()
-    im = Image.open(p).convert("RGB")
-    if im.size != (920, 300):
-        im = im.resize((920, 300), Image.LANCZOS)
-    im.save(p, "PNG", optimize=True)
-    import os
-    print("saved graphical_abstract  %s px  %.1f KB  mode %s"
-          % (im.size, os.path.getsize(p) / 1024, im.mode))
+    # ── baseline ────────────────────────────────────────────────────────────────
+    rule(C1, E3, 0.076, HAIR)
+    T(C1, 0.034, "RATAN-PBind", 6.7, INK, "bold")
+    T(C1 + 0.097, 0.034, "sequence-based prioritisation of de novo binders, returned "
+      "with the regime each score falls in", 5.8, GREY)
+
+    # ── geometry gate ───────────────────────────────────────────────────────────
+    fig.canvas.draw()
+    inv = fig.transFigure.inverted()
+    BOUNDS = {0: (0.0, DIV1), 1: (DIV1, DIV2), 2: (DIV2, 1.0)}
+    bad = []
+    for t, col in TEXTS:
+        if col is None:
+            continue
+        bb = t.get_window_extent(fig.canvas.get_renderer()).transformed(inv)
+        lo, hi = BOUNDS[col]
+        if bb.x0 < lo - 1e-6 or bb.x1 > hi + 1e-6:
+            bad.append((t.get_text().split("\n")[0][:38], bb.x0, bb.x1, lo, hi))
+    for b in bad:
+        print("  CROSSES COLUMN  %-40r x %.4f-%.4f  allowed %.3f-%.3f" % b)
+    if bad:
+        raise SystemExit("%d label(s) cross a column boundary" % len(bad))
+    print("geometry gate: %d labels, all inside their columns" % len(TEXTS))
+
+    # ── write ───────────────────────────────────────────────────────────────────
+    # The journal takes jpeg, png or svg at 920 x 300 and at most 150 KB. The SVG
+    # is the one to submit: it carries the same 920 x 300 canvas but stays sharp
+    # at any zoom, where the PNG has only 920 x 300 pixels to show. Text goes out
+    # as paths so the file does not depend on Arial being installed wherever it
+    # is rendered.
+    os.makedirs(FIG, exist_ok=True)
+    pdf = str(FIG / "graphical_abstract.pdf")
+    png = str(FIG / "graphical_abstract.png")
+    svg = str(FIG / "graphical_abstract.svg")
+    fig.savefig(pdf, facecolor="white", pad_inches=0)
+    with matplotlib.rc_context({"svg.fonttype": "none"}):
+        fig.savefig(svg, facecolor="white", pad_inches=0)
+    fig.savefig(png, dpi=100 * SS, facecolor="white", pad_inches=0)
+    plt.close(fig)
+
+    im = Image.open(png).convert("RGB")
+    big = im.size
+    im.resize((W, H), Image.LANCZOS).save(png, "PNG", optimize=True)
+    # the cartoon is a few thousand polygons, so the raw SVG runs over the
+    # journal's 150 KB; rounding every coordinate to 0.1 pt moves nothing on a
+    # 920 px canvas and takes about a quarter off the file
+    import xml.etree.ElementTree as ET
+    t = io.open(svg, encoding="utf8").read()
+    t = re.sub(r"<metadata>.*?</metadata>", "", t, flags=re.S)
+
+    # Round coordinates ONLY inside path data. The text labels are literal
+    # characters in the file, so a blanket number regex rewrites 0.895 as 0.8
+    # and 4.65 as 4.6, which is how the first version of this figure went
+    # wrong in the first place.
+    def _round(m):
+        return 'd="' + re.sub(r"(\d+\.\d)\d+", lambda k: k.group(1), m.group(1)) + '"'
+
+    t = re.sub(r'd="([^"]*)"', _round, t)
+    ET.fromstring(t)                      # refuse to write a malformed SVG
+
+    # content gate: every number a reader can see must survive intact
+    for want in ("0.895", "0.503", "4.65", "0.70", "0.76", "2,630", "17.8%",
+                 "470 features", "2 + 2 labels", "about 0.70"):
+        if want not in t:
+            raise SystemExit("the SVG lost %r" % want)
+    io.open(svg, "w", encoding="utf8").write(t)
+
+    for f in (png, svg):
+        if not os.path.exists(f):
+            raise SystemExit("%s was not written" % f)
+        kb = os.path.getsize(f) / 1024
+        print("%-26s %6.1f KB   (limit 150 KB)" % (os.path.basename(f), kb))
+        if kb > 150:
+            raise SystemExit("%s is over the 150 KB limit" % os.path.basename(f))
+    print("png rendered %dx%d -> %dx%d; svg is vector on the same canvas"
+          % (big[0], big[1], W, H))
+    print("vector copy:", os.path.basename(pdf))
 
 
 # ── carry the unchanged figures across under the manuscript numbering ────────
