@@ -46,7 +46,12 @@ DEMO_SEQUENCES = {
 
 # ── Groq AI (primary) ─────────────────────────────────────────────────────────
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GROQ_MODEL   = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+# The faithfulness evaluation in the paper used llama-3.3-70b-versatile. Groq has since
+# withdrawn that model, so the default here is a model the service currently serves; any
+# other can be set through GROQ_MODEL (GET https://api.groq.com/openai/v1/models lists
+# them). The interpretation text is the only part of the release that the pinned
+# environment does not reproduce.
+GROQ_MODEL   = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 
 def groq_available() -> bool:
     return bool(GROQ_API_KEY)
@@ -56,9 +61,10 @@ def ask_groq(messages: list, system: str = "") -> str:
         from groq import Groq
         client = Groq(api_key=GROQ_API_KEY)
         full_messages = ([{"role": "system", "content": system}] if system else []) + messages
+        extra = {"reasoning_effort": "low"} if GROQ_MODEL.startswith("openai/gpt-oss") else {}
         resp = client.chat.completions.create(
-            model=GROQ_MODEL, messages=full_messages, max_tokens=512, temperature=0.7)
-        return resp.choices[0].message.content
+            model=GROQ_MODEL, messages=full_messages, max_tokens=512, temperature=0.7, **extra)
+        return resp.choices[0].message.content or ""
     except Exception as e:
         return f"Error: {e}"
 
@@ -196,7 +202,7 @@ def single_predict(sequence: str, target: str, design_method: str, load_demo: st
             ai_badge  = ('<span style="font-size:10px; font-weight:600; '
                          'text-transform:uppercase; letter-spacing:0.5px; '
                          'color:#1D4ED8; background:#EFF6FF; '
-                         'padding:2px 7px; border-radius:4px;">Groq · llama-3.3-70b</span>')
+                         'padding:2px 7px; border-radius:4px;">Groq · ' + GROQ_MODEL + '</span>')
         else:
             ai_text  = explanation["natural_language"]
             ai_label = "Analysis"
@@ -483,7 +489,7 @@ def run_design(
         )
         ai_badge = ('<span style="font-size:10px;font-weight:600;color:#1D4ED8;'
                     'background:#EFF6FF;padding:2px 7px;border-radius:4px;">'
-                    'Groq · llama-3.3-70b</span>')
+                    'Groq · ' + GROQ_MODEL + '</span>')
     else:
         ai_text  = (f"Design complete. Best sequence achieved {best_prob:.1%} "
                     f"binding probability ({'+' if impr >= 0 else ''}{impr:.1%} vs seed). "
