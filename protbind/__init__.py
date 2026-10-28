@@ -1,5 +1,5 @@
 """
-RATAN-PBind - Residue Attribution and Target Affinity Network for Protein Binding
+RATAN-PBind - Retrieval-Augmented, Target-Aware Nomination for Protein Binding
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
 
 Quick start:

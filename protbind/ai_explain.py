@@ -215,6 +215,11 @@ def call_groq(prompt: str, api_key: str, model: str,
     try:
         from groq import Groq
         client = Groq(api_key=api_key)
+        extra = {}
+        if model.startswith("openai/gpt-oss"):
+            # a reasoning model spends max_tokens on hidden reasoning first and can
+            # return an empty message at these budgets, so keep that pass short
+            extra["reasoning_effort"] = "low"
         resp = client.chat.completions.create(
             model=model,
             messages=[
@@ -223,8 +228,9 @@ def call_groq(prompt: str, api_key: str, model: str,
             ],
             max_tokens=max_tokens,
             temperature=0.4,   # lower temperature = more precise/reproducible
+            **extra,
         )
-        return resp.choices[0].message.content.strip()
+        return (resp.choices[0].message.content or "").strip()
     except Exception as e:
         return f"[AI analysis unavailable: {e}]"
 

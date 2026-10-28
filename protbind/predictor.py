@@ -1,6 +1,6 @@
 """
 protbind.predictor — Core RATAN-PBind prediction engine
-RATAN-PBind: Residue Attribution and Target Affinity Network for Protein Binding
+RATAN-PBind: Retrieval-Augmented, Target-Aware Nomination for Protein Binding
 This work used Proteinbase by Adaptyv Bio under ODC-BY license
 
 Usage:
@@ -27,7 +27,7 @@ _FEATURES_DIR = _HERE / "features"
 
 class ProtBind:
     """
-    RATAN-PBind — Residue Attribution and Target Affinity Network for Protein Binding.
+    RATAN-PBind — Retrieval-Augmented, Target-Aware Nomination for Protein Binding.
 
     Predicts whether a protein sequence will bind to a specified target
     using a LightGBM ensemble trained on the Proteinbase dataset.
