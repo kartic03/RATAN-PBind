@@ -777,6 +777,12 @@ def carry():
             if s.exists():
                 shutil.copy2(s, FIG / ("%s.%s" % (dst, ext)))
                 print("carried", s.name, "->", "%s.%s" % (dst, ext))
+            else:
+                # the released repository ships these three under their
+                # manuscript names in figures/ and does not carry the paper
+                # tree, so there is nothing to copy and nothing is wrong
+                print("not carried (absent, already released as %s.%s): %s"
+                      % (dst, ext, s.name))
 
 
 if __name__ == "__main__":
