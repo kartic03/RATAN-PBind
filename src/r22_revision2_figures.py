@@ -717,6 +717,13 @@ def graphical_abstract():
     fig.savefig(pdf, facecolor="white", pad_inches=0)
     with matplotlib.rc_context({"svg.fonttype": "none"}):
         fig.savefig(svg, facecolor="white", pad_inches=0)
+    # A second SVG with the type converted to outlines. The journal copy keeps
+    # text as text to stay under 150 KB, which means it needs Arial wherever it
+    # is rendered; this one carries no font dependency and is what the README
+    # shows, where file size does not matter.
+    outlined = str(FIG / "graphical_abstract_outlined.svg")
+    with matplotlib.rc_context({"svg.fonttype": "path"}):
+        fig.savefig(outlined, facecolor="white", pad_inches=0)
     fig.savefig(png, dpi=100 * SS, facecolor="white", pad_inches=0)
     plt.close(fig)
 
@@ -747,12 +754,13 @@ def graphical_abstract():
             raise SystemExit("the SVG lost %r" % want)
     io.open(svg, "w", encoding="utf8").write(t)
 
-    for f in (png, svg):
+    for f in (png, svg, outlined):
         if not os.path.exists(f):
             raise SystemExit("%s was not written" % f)
         kb = os.path.getsize(f) / 1024
-        print("%-26s %6.1f KB   (limit 150 KB)" % (os.path.basename(f), kb))
-        if kb > 150:
+        cap = "" if f == outlined else "   (limit 150 KB)"
+        print("%-34s %6.1f KB%s" % (os.path.basename(f), kb, cap))
+        if f != outlined and kb > 150:
             raise SystemExit("%s is over the 150 KB limit" % os.path.basename(f))
     print("png rendered %dx%d -> %dx%d; svg is vector on the same canvas"
           % (big[0], big[1], W, H))
