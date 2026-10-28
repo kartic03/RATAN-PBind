@@ -8,7 +8,9 @@ A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 exp
 
 Current release: **v1.3** (the version reported in the paper).
 
-![Graphical Abstract](graphical_abstract.png)
+![Graphical Abstract](graphical_abstract.svg)
+
+<sub>Vector, so it stays sharp at any zoom. `figures/graphical_abstract.svg` is the same figure with the type kept as text and under the 150 KB the journal allows; `graphical_abstract.png` is the 920 x 300 raster.</sub>
 
 ## What it does
 
