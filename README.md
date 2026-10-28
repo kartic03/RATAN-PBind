@@ -6,7 +6,7 @@
 
 A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein-target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders and reports where its predictions can and cannot be trusted.
 
-Current release: **v1.2** (the version reported in the paper).
+Current release: **v1.3** (the version reported in the paper).
 
 ![Graphical Abstract](graphical_abstract.png)
 
