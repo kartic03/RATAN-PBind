@@ -6,6 +6,8 @@
 
 A machine-learning pre-screen for de novo binder campaigns, trained on 2,630 experimentally labelled protein-target pairs across 24 human and viral targets from the [Proteinbase dataset](https://proteinbase.com) (Adaptyv Bio, ODC-BY licence). It ranks candidate binders and reports where its predictions can and cannot be trusted.
 
+Current release: **v1.2** (the version reported in the paper).
+
 ![Graphical Abstract](graphical_abstract.png)
 
 ## What it does
@@ -23,12 +25,12 @@ The main result is a measured **applicability domain**: performance is reported 
 | In-distribution, held-out test | **0.946** (95% CI 0.920-0.969) |
 | In-distribution, nested cross-validation (leakage-free) | **0.895 ± 0.006** |
 | Across design methods (leave-author/method-out, prototypes recomputed per fold) | 0.70-0.76 |
-| Fresh campaign on a known target | about 0.73 |
+| Fresh campaign on a known target | 0.70-0.76 (leave-author-out 0.761, leave-design-method-out 0.702, leave-one-method-out 0.706) |
 | Zero-shot to a novel target (LOTO) | 0.54-0.57 |
-| Independent dataset (after de-duplication), per target | at chance; every 95% interval includes 0.5 |
+| Independent dataset (after de-duplication), per target | at chance; mean 0.503 over five targets, every 95% interval includes 0.5 |
 
 - **470 features** (463 base + 7 prototype-similarity). `proto_ratio` is the top SHAP feature.
-- **Practical utility:** top-10% ranking enriches binders **4.7×** over the 17.1% test-set binding rate (top-5% reaches 90% precision, 5.3×).
+- **Practical utility:** top-10% ranking enriches binders **4.65×** over the 17.1% test-set binding rate (top-5% reaches 90% precision, 5.27×). Those figures are the random held-out split; under grouped splits the top decile enriches 1.7-3.6× (Table S8).
 - **Few-shot:** adding ~2 known binders of a new target recovers AUROC from near chance to **~0.70**.
 - **Validated:** label-shuffle control, sequence- and batch-level leakage audits, nearest-neighbour and single-feature baselines, external (Overath 2025) and natural-PPI (SKEMPI 2.0) checks, and independent structural validation (Boltz-2 ipTM, MM-GBSA).
 - The model is a **binder/non-binder classifier** and does not rank affinity.
@@ -50,6 +52,8 @@ pixi run -e gpu python src/r1_embed_targets.py # ESM-2 embeddings (CUDA)
 
 ### Optional: Groq LLM interpretation
 Create a `.env` file with `GROQ_API_KEY=...` (free key at [console.groq.com](https://console.groq.com)). The LLM module is a faithfulness-bounded convenience (~87% grounded in the SHAP evidence), not a mechanistic claim.
+
+The faithfulness figures in the paper (87% of cited features grounded, 104 of 120) were measured with `llama-3.3-70b-versatile`. Groq has since withdrawn that model, so the app defaults to `openai/gpt-oss-120b`; set `GROQ_MODEL` in `.env` to use another (`GET https://api.groq.com/openai/v1/models` lists what the service currently serves). The interpretation text is the only part of this release that the pinned environment does not reproduce, and a different model will change it.
 
 ## Usage
 
@@ -73,6 +77,8 @@ Targets with few known binders fall in the few-shot regime, so interpret scores 
 
 Each prediction reports a regime derived from the target's prototype support: 20 or more known binders (in-domain), 2 to 19 (few-shot), fewer than 2 (extrapolation). These cut points are conventions chosen for usability, not transitions found in the data (Table S13 of the paper).
 
+The web app also prints a binder/non-binder verdict. For that verdict it applies a per-target decision threshold chosen on the validation split (the value in 0.05-0.94 that maximises validation F1, and 0.5 for a target with fewer than five validation pairs or no class variation). The thresholds are stored in `models/ensemble_meta_6b.pkl` and run from 0.05 (IL7R) to 0.5; PD-L1 is 0.28 and EGFR 0.17. Every metric in the paper uses a fixed 0.5 threshold, and the ranking the tool is meant for does not depend on any threshold.
+
 ## Reproducing the analysis
 
 All experiments are scripted under `src/` and regenerate from the released artefacts:
@@ -80,7 +86,8 @@ All experiments are scripted under `src/` and regenerate from the released artef
 - `src/r1_*` target-aware modelling / leave-one-target-out
 - `src/r3_robust_eval.py` bootstrap CIs, per-target reliability, shared-vs-single
 - `src/r8_*`, `src/r8b_*` significance, leakage audits, few-shot, baselines, calibration, external/SKEMPI/MM-GBSA
-- `src/r7_figures_final.py` the manuscript figure set
+- `src/r7_figures_final.py`, `src/r22_revision2_figures.py` the manuscript figure set
+- `src/r22_seed_and_calibration.py` per-seed metrics and the measured reliability curve (Table S2, Figure 7)
 - `src/r12_deployment_matched.py` configurations ordered by what each needs at inference (Table S7)
 - `src/r13_grouped_prospective.py` grouped prospective splits and per-method results (Tables S8, S9)
 - `src/r14_fewshot_variability.py` few-shot support-set variability
@@ -100,7 +107,7 @@ The ablation models `models/lgb_interface_hc.pkl` and `models/xgb_interface_hc.p
 
 ## Data
 
-Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence). The raw dataset is not redistributed here; download from https://storage.proteinbase.com/proteinbase_all_data_28_01_2026.csv
+Training data from **Proteinbase** by Adaptyv Bio (ODC-BY licence). The raw dataset is not redistributed here; download the pinned snapshot used here, `proteinbase_all_data_28_01_2026.csv` (version of 28 January 2026), from https://storage.proteinbase.com/proteinbase_all_data_28_01_2026.csv
 
 The external files read by the analysis scripts, their sources and licences are listed in [data/external/README.md](data/external/README.md).
 
@@ -118,4 +125,13 @@ Department of Life Sciences, Gachon University, Seongnam, Republic of Korea.
 
 ## Licence
 
-MIT, see [LICENSE](LICENSE). Training data: ODC-BY (Proteinbase, Adaptyv Bio).
+Three licences apply to different parts of this release:
+
+| Component | Licence |
+|---|---|
+| Source code in this repository (`src/`, `protbind/`, `app.py`) | MIT, see [LICENSE](LICENSE) |
+| Zenodo deposit [10.5281/zenodo.20656437](https://doi.org/10.5281/zenodo.20656437) as a whole | CC BY 4.0 |
+| Proteinbase-derived artefacts inside both (feature matrices, ESM-2 embeddings, split indices) | ODC-BY 1.0, from Adaptyv Bio |
+
+Downstream users of the feature matrices and embeddings remain bound by ODC-BY attribution regardless of the licence on the container.
+
