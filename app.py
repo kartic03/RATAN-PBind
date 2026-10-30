@@ -754,7 +754,7 @@ label, label span, label > span {
     text-transform: uppercase !important;
     letter-spacing: 0.4px !important;
 }
-input, textarea, select,
+input:not([type="radio"]):not([type="checkbox"]), textarea, select,
 .block, .form,
 [data-testid="textbox"] textarea,
 [data-testid="dropdown"] {
@@ -870,6 +870,74 @@ footer { display: none !important; }
     padding: 20px 0 10px;
     border-top: 1px solid #E2E8F0;
     margin-top: 16px;
+}
+
+/* Radio / checkbox
+   The generic `input` rule above is excluded from these two types on purpose.
+   Gradio marks the selected state with
+       input[type=radio]:checked { background-image: var(--radio-circle);
+                                   background-color: ...selected;
+                                   border-color:     ...selected }
+   and none of those are !important, so a blanket
+   `input { background: #FFFFFF !important; border-color: ...; border-radius: 6px }`
+   overrode all three - the shorthand reset background-image to none, so the dot
+   vanished, the fill stayed white and the circle became a square. Gradio sets
+   appearance:none, so the browser drew no native indicator either: checked and
+   unchecked rendered identically and the control looked dead. Styled explicitly
+   here instead, without depending on Gradio's custom properties. */
+input[type="radio"], input[type="checkbox"] {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    box-sizing: border-box !important;
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    flex: none !important;
+    margin: 0 8px 0 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    border: 1.5px solid #CBD5E1 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    transition: border-color .12s ease, background-color .12s ease !important;
+}
+input[type="radio"]    { border-radius: 50% !important; }
+input[type="checkbox"] { border-radius: 4px  !important; }
+
+input[type="radio"]:hover, input[type="checkbox"]:hover {
+    border-color: #1D4ED8 !important;
+}
+
+input[type="radio"]:checked {
+    background: radial-gradient(circle at 50% 50%,
+                #FFFFFF 0 3px, #1D4ED8 3px 100%) !important;
+    border-color: #1D4ED8 !important;
+}
+input[type="checkbox"]:checked {
+    background: #1D4ED8 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.4l3 3 6-6'/></svg>") center / 11px no-repeat !important;
+    border-color: #1D4ED8 !important;
+}
+
+input[type="radio"]:focus-visible, input[type="checkbox"]:focus-visible {
+    outline: 2px solid #93C5FD !important;
+    outline-offset: 1px !important;
+}
+
+/* Each choice is a <span> inside a <label>, so the `label span` rule above was
+   uppercasing and bolding the option text, making choices read as headings. */
+[data-testid$="-radio-label"], [data-testid$="-checkbox-label"] {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0 !important;
+    cursor: pointer !important;
+    padding: 5px 2px !important;
+}
+[data-testid$="-radio-label"] span, [data-testid$="-checkbox-label"] span {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #374151 !important;
 }
 """
 
@@ -1095,7 +1163,7 @@ with gr.Blocks(title="RATAN-PBind", css=CSS, theme=LIGHT_THEME) as demo:
                     design_mode = gr.Radio(
                         choices=["In silico directed evolution", "ESM-2 Redesign", "Combined (recommended)"],
                         value="Combined (recommended)",
-                        label="")
+                        label="", show_label=False)
 
                     with gr.Accordion("Parameters", open=False):
                         d_ngen  = gr.Slider(5, 30,  value=10, step=1,
